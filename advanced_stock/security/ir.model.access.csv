@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_advanced_stock_advanced_stock,advanced_stock.advanced_stock,model_advanced_stock_advanced_stock,,1,0,0,0

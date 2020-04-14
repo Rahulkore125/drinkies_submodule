@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="stock_picking_form_inherit" model="ir.ui.view">
+            <field name="name">Stock Picking Form Inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="priority">17</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='%(stock.action_report_delivery)d']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_toggle_is_locked']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//page[@name='extra']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_send_confirmation_email']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='scheduled_date']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="has_return_picking" invisible="1"/>
+                    <field name="is_return_picking" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//button[@name='%(stock.act_stock_return_picking)d']" position="replace">
+                    <button name="%(stock.act_stock_return_picking)d" string="Return"
+                            attrs="{'invisible': ['|', ('state', '!=', 'done'), '|', ('is_locked', '=', False), '|', ('has_return_picking','=', True), ('is_return_picking', '=', True)]}"
+                            type="action" groups="base.group_user"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="stock.action_stock_scrap">
+            <field name="name">Scrap Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.scrap</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="context">{'create': False}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Scrap products
+                </p>
+                <p>
+                    Scrapping a product will remove it from your stock. The product will
+                    end up in a scrap location that can be used for reporting purpose.
+                </p>
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="stock_picking_return_line_inherit" model="ir.ui.view">
+            <field name="name">Stock Return Move Line Inherit</field>
+            <field name="model">stock.return.picking</field>
+            <field name="inherit_id" ref="stock_account.view_stock_return_picking_form_inherit_stock_account"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='to_refund']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="scrap_form_inherit" model="ir.ui.view">
+            <field name="name">Scrap Form Inherit</field>
+            <field name="model">stock.scrap</field>
+            <field name="inherit_id" ref="stock.stock_scrap_form_view2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_uom_id']" position="attributes">
+                    <attribute name="options">{'no_create_edit': True}</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="magento_product_attribute_form_view" model="ir.ui.view">
+            <field name="name">product.attribute.form.inherit</field>
+            <field name="model">magento.product.attribute</field>
+            <field name="arch" type="xml">
+                <form string="Product attributes" create="false" delete="false" edit="false">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="create_variant"/>
+                        </group>
+                        <group>
+                            <field name="magento_bind_ids"/>
+                        </group>
+                        <group>
+                            <field name="value_ids"/>
+                        </group>
+                        <group>
+                            <field name="attribute_line_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="magento_product_attribute_tree_view" model="ir.ui.view">
+            <field name="name">product.attribute.tree.inherit</field>
+            <field name="model">magento.product.attribute</field>
+            <field name="arch" type="xml">
+                <tree string="Product attributes" create="false" delete="false" edit="false">
+                    <field name="name"/>
+                    <field name="magento_bind_ids" widget="many2many_tags"/>
+                    <field name="sequence"/>
+                    <field name="create_variant"/>
+                    <field name="attribute_line_ids" widget="many2many_tags"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="magento_product_attribute_action_view" model="ir.actions.act_window">
+            <field name="name">Product Attributes</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">magento.product.attribute</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="magento_menu_product_attribute" name="Product Attributes" parent="magento_products" action="magento_product_attribute_action_view" sequence="100"/>
+    </data>
+</odoo>

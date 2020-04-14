@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!--magento backend view-->
+    <record id="magento_operation_quickly" model="ir.ui.view">
+        <field name="name">magento.operation.quickly</field>
+        <field name="model">magento.operation</field>
+        <field name="arch" type="xml">
+            <form string="Magento Operation">
+                <sheet>
+                    <group>
+                        <field name="name" widget="many2many_tags"/>
+
+                    </group>
+                    <notebook>
+                        <page string="Import Operation">
+                            <group>
+                                <field name="import_customer"/>
+                            </group>
+                            <group>
+                                <field name="import_product"/>
+                            </group>
+                            <group>
+                                <field name="import_sale_order"/>
+                            </group>
+                            <group>
+                                <field name="import_invoice"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button string="Execute" special="cancel" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="magento_operation_quickly_action" model="ir.actions.act_window">
+        <field name="name">Magento Operation</field>
+        <field name="res_model">magento.operation</field>
+        <field name="src_model">magento.operation</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="magento_operation_quickly"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

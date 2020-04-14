@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_advanced_sale_sale_order,advanced_sale.sale_order,model_sale_order,advanced_sale.warehouse_supervisor,1,1,1,0
+access_advanced_sale_sale_order,advanced_sale.sale_order,model_sale_order,advanced_sale.warehouse_manager,1,0,0,0
+access_advanced_sale_sale_order,advanced_sale.sale_order,model_sale_order,advanced_sale.user_readonly_everything,1,0,0,0
+access_advanced_sale_res_partner,advanced_sale.res_partner,model_res_partner,advanced_sale.user_readonly_everything,1,0,0,0
+access_advanced_sale_stock_picking,advanced_sale.stock_picking,model_stock_picking,advanced_sale.user_readonly_everything,1,0,0,0
+access_advanced_sale_sale_hnk_report,advanced_sale.sale_hnk_report,model_sale_hnk_report,,1,1,1,1
+access_advanced_sale_sale_hnk_report_line,advanced_sale.sale_hnk_report_line,model_sale_hnk_report_line,,1,1,1,1
+access_advanced_sale_shipper,access_advanced_sale_shipper,model_shipper,,1,1,1,1
+access_advanced_stock_quant,access_advanced_stock_quant,stock.model_stock_quant,,1,1,1,1

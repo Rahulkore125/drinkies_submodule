@@ -1,0 +1,18 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_magento_backend,Magento_backend,model_magento_backend,,1,1,1,1
+access_magento_website,Magento website,model_magento_website,,1,1,1,1
+access_magento_store,Magento store,model_magento_store,,1,1,1,1
+access_magento_storeview,Magento storeview,model_magento_storeview,,1,1,1,1
+access_magento_binding,Magento binding,model_magento_binding,,1,1,1,1
+access_magento_pull_history,Magento history,model_magento_pull_history,,1,1,1,1
+access_magento_res_partner,Magento res_partner,model_magento_res_partner,,1,1,1,1
+access_magento_res_partner_category,Magento Customers Group,model_magento_res_partner_category,,1,1,1,1
+access_magento_address,Mageto address,model_magento_address,,1,1,1,1
+access_magento_sale_order,Magento sale order,model_magento_sale_order,,1,1,1,1
+access_magento_sale_order_line,Magento sale order line,model_magento_sale_order_line,,1,1,1,1
+access_magento_operation,Magento operation,model_magento_operation,,1,1,1,1
+access_magento_product_product,Magento product,model_magento_product_product,,1,1,1,1
+access_magento_product_category,Magento product category,model_magento_product_category,,1,1,1,1
+access_magento_product_attribute,Magento product attribute,model_magento_product_attribute,,1,1,1,1
+access_magento_account_invoice,Magento invoice,model_magento_account_invoice,,1,1,1,1
+access_magento_source,Magento source,model_magento_source,,1,1,1,1

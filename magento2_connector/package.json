@@ -1,0 +1,71 @@
+[
+  {
+    "id": 1,
+    "parent_id": 0,
+    "name": "Root Catalog",
+    "is_active": null,
+    "position": 0,
+    "level": 0,
+    "product_count": 0,
+    "children_data": [
+      {
+        "id": 2,
+        "parent_id": 1,
+        "name": "Root category s1",
+        "is_active": true,
+        "position": 1,
+        "level": 1,
+        "product_count": 10533,
+        "children_data": []
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "parent_id": 0,
+    "name": "Root Catalog",
+    "is_active": null,
+    "position": 0,
+    "level": 0,
+    "product_count": 0,
+    "odoo_id": 5465,
+    "children_data": [
+      {
+        "id": 2,
+        "parent_id": 1,
+        "name": "Root category s1",
+        "is_active": true,
+        "position": 1,
+        "level": 1,
+        "product_count": 10533,
+        "odoo_id": 5466,
+        "children_data": []
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "parent_id": 0,
+    "name": "Root Catalog",
+    "is_active": null,
+    "position": 0,
+    "level": 0,
+    "product_count": 0,
+    "odoo_id": 11,
+    "odoo_parent_id": null,
+    "children_data": [
+      {
+        "id": 2,
+        "parent_id": 1,
+        "name": "Root category s1",
+        "is_active": true,
+        "position": 1,
+        "level": 1,
+        "product_count": 10533,
+        "odoo_id": 12,
+        "odoo_parent_id": 11,
+        "children_data": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- This Menu Item will appear in the Upper bar, That's why It needs NO parent or action -->
+    <menuitem id="magento_odoo_connector_root" name="Magento" sequence="1"/>
+
+    <!-- This Menu Item Must have a parent -->
+    <menuitem id="magento_dashboard" name="Dashboard" parent="magento_odoo_connector_root" sequence="1"/>
+
+    <menuitem id="magento_customer_and_sale" name="Customers &amp; Sales" parent="magento_odoo_connector_root"
+              sequence="2"/>
+
+    <menuitem id="magento_categories" name="Categories" parent="magento_odoo_connector_root" sequence="3"/>
+
+    <menuitem id="magento_products" name="Products" parent="magento_odoo_connector_root" sequence="4"/>
+
+    <menuitem id="magento_invoice" name="Invoice" parent="magento_odoo_connector_root" sequence="5"/>
+
+    <menuitem id="magento_config" name="Configuration" parent="magento_odoo_connector_root" sequence="6"/>
+</odoo>

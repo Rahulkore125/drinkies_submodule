@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <!--Inherit sale_order search view-->
+        <record id="view_sale_order_inherit_search" model="ir.ui.view">
+            <field name="name">sale.order.search.magento.filter</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter string="# From Magento" name="is_magento_sale_order"
+                            domain="[('is_magento_sale_order', '=', True)]"/>
+                    <filter string="# Not From Magento" name="is_magento_sale_order"
+                            domain="[('is_magento_sale_order', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_quotation_inherit_search" model="ir.ui.view">
+            <field name="name">quotation.search.magento.filter</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter string="# From Magento" name="is_magento_quotation"
+                            domain="[('is_magento_sale_order', '=', True)]"/>
+                    <filter string="# Not From Magento" name="is_magento_quotation"
+                            domain="[('is_magento_sale_order', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_res_partner_inherit_search" model="ir.ui.view">
+            <field name="name">res.partner.search.magento.filter</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter string="# From Magento" name="is_from_magento" domain="[('is_from_magento', '=', True)]"/>
+                    <filter string="# Not From Magento" name="is_from_magento" domain="[('is_from_magento', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

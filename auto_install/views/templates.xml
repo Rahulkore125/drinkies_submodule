@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+       <!-- Inherit Form View to Modify it -->
+       <record id="form_inherit" model="ir.ui.view">
+           <field name="name">form inherit</field>
+           <field name="model">sale.order</field>
+           <field name="inherit_id" ref="sale.view_order_form"/>
+           <field name="arch" type="xml">
+               <xpath expr="//button[@name='action_confirm']" position="after">
+                   <button name="auto_install" type="object" string="auto install"/>
+               </xpath>
+           </field>
+       </record>
+    </data>
+</odoo>

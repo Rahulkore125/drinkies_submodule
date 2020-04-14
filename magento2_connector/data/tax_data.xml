@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="tax_100" model="account.tax">
+            <field name="name">Tax 100%</field>
+            <field name="amount">100</field>
+        </record>
+
+        <record id="tax_real" model="product.product">
+            <field name="name">Tax</field>
+            <field name="taxes_id" eval="[(6, 0, [ref('magento2_connector.tax_100')])]"/>
+            <field name="type">service</field>
+        </record>
+        <record id="tax_fake" model="product.product">
+            <field name="name">Tax Fake</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="type">service</field>
+        </record>
+        <record id="discount_record" model="product.product">
+            <field name="name">Discount</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="type">service</field>
+        </record>
+    </data>
+</odoo>

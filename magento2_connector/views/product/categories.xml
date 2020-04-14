@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="magento_product_category_act" model="ir.actions.act_window">
+            <field name="name">Magento Product Category</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">magento.product.category</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <record id="magento_product_category_form_view" model="ir.ui.view">
+            <field name="name">Magneto Category</field>
+            <field name="model">magento.product.category</field>
+            <field name="arch" type="xml">
+                <form string="Product Category Magento" create="false" delete="false" edit="false">
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="odoo_id"/>
+                            <field name="magento_parent_id"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="magento_child_ids"/>
+                        </group>
+                        <group col="4">
+                            <field name="product_count"/>
+                            <field name="backend_id"/>
+                            <field name="external_id"/>
+                            <field name="parent_id"/>
+                            <field name="parent_path"/>
+                        </group>
+                        <group>
+                            <field name="child_id"/>
+                            <field name="route_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="magento_product_category_tree_view" model="ir.ui.view">
+            <field name="name">Magneto Category</field>
+            <field name="model">magento.product.category</field>
+            <field name="arch" type="xml">
+                <tree string="Product Category Magento" create="false" delete="false" edit="false">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="magento_parent_id"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+
+    <menuitem id="product_category_menu"
+              name="Product Categories"
+              parent="magento_products"
+              action="magento_product_category_act"
+              sequence="55"/>
+</odoo>

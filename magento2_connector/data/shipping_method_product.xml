@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <data>
+        <record id="magento_flat_rate_shipping_product" model="product.product">
+            <field name="name">Flat Rate</field>
+            <field name="standard_price">5</field>
+            <field name="list_price">5</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_free_shipping_product" model="product.product">
+            <field name="name">Free Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_table_rates_shipping_product" model="product.product">
+            <field name="name">Table Rates</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_ups_shipping_product" model="product.product">
+            <field name="name">UPS Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_usps_shipping_product" model="product.product">
+            <field name="name">USPS Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_fedex_shipping_product" model="product.product">
+            <field name="name">FedEx Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_dhl_shipping_product" model="product.product">
+            <field name="name">DHL Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+
+        <record id="magento_getswift_shipping_product" model="product.product">
+            <field name="name">GetSwift Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+    </data>
+</odoo>

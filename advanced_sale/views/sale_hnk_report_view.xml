@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_hnk_report_action" model="ir.actions.act_window">
+            <field name="name">Sale &amp; Stock Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.hnk.report</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="sale_hnk_report_form" model="ir.ui.view">
+            <field name="name">Sale &amp; Stock Report</field>
+            <field name="model">sale.hnk.report</field>
+            <field name="arch" type="xml">
+                <form string="Sale Heineken Form">
+                    <sheet>
+                        <group>
+                            <field name="compute_at_date" widget="radio"/>
+                            <field name="date_report" attrs="{'invisible': [('compute_at_date', '=', 1)], 'required': [('compute_at_date', '=', 0)]}"/>
+                            <field name="from_date_report" attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
+                            <field name="to_date_report" attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
+                        </group>
+                        <footer>
+                            <button name="generate_report" type="object" class="oe_highlight"
+                                    string="Generate Report"/>
+                            <button string="Discard" class="oe_highlight" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_hnk_report_line_search_view" model="ir.ui.view">
+            <field name="name">Sale HNK Report Search View</field>
+            <field name="model">sale.hnk.report.line</field>
+            <field name="arch" type="xml">
+                <search string="Search HNK Report">
+                    <filter name="group_category_id" string="Category" icon="terp-partner"
+                            context="{'group_by':'product_category_id'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="sale_hnk_report_line_tree" model="ir.ui.view">
+            <field name="name">Sale HNK Report</field>
+            <field name="model">sale.hnk.report.line</field>
+            <field name="arch" type="xml">
+                <tree string="Sale HNK Report" create="false" delete="false" edit="false">
+                    <field name="product_id"/>
+                    <!--                    <field name="product_category_id"/>-->
+                    <field name="open_stock"/>
+                    <field name="open_stock_units"/>
+                    <field name="damaged"/>
+                    <field name="returned"/>
+                     <field name="close_stock"/>
+                    <field name="close_stock_units"/>
+                    <field name="amount_discount"/>
+                    <field name="sum_sale_chanel"/>
+                    <field name="sum_fp_chanel"/>
+                    <field name="sum_grab_chanel"/>
+                    <field name="sum_shopee_chanel"/>
+                    <field name="sum_pos_chanel"/>
+                    <field name="sum_lazmall_chanel"/>
+                    <field name="sum_lalafood_chanel"/>
+                    <field name="amount_sale_cod"/>
+                    <field name="amount_sale_ol"/>
+                    <field name="amount_fp_cod"/>
+                    <field name="amount_fp_ol"/>
+                    <field name="amount_shopee_cod"/>
+                    <field name="amount_shopee_ol"/>
+                    <field name="amount_pos_cod"/>
+                    <field name="amount_pos_ol"/>
+                    <field name="amount_lazmall_cod"/>
+                    <field name="amount_lazmall_ol"/>
+                    <field name="amount_lalafood_cod"/>
+                    <field name="amount_lalafood_ol"/>
+                    <field name="amount_grab_cod"/>
+                    <field name="amount_grab_ol"/>
+                </tree>
+            </field>
+        </record>
+        <menuitem id="sale_hnk_report" name="Sale &amp; Stock Report" parent="sale.menu_sale_report"
+                  action="sale_hnk_report_action" sequence="100"/>
+    </data>
+</odoo>

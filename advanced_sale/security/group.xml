@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+       <record id="warehouse_supervisor" model="res.groups">
+            <field name="name">Warehouse Supervisor</field>
+<!--            <field name="category_id" ref="group_security"/>-->
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="warehouse_manager" model="res.groups">
+            <field name="name">Warehouse Manager</field>
+<!--            <field name="category_id" ref="group_security"/>-->
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="user_readonly_everything" model="res.groups">
+            <field name="name">User Readonly Everything</field>
+<!--            <field name="category_id" ref="group_security"/>-->
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</odoo>

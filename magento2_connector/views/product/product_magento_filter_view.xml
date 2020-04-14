@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <!--Inherit quotations search view-->
+        <record id="view_product_inherit_search" model="ir.ui.view">
+            <field name="name">product.search.magento.filter</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <separator/>
+                    <filter string="# From Magento" name="is_magento_product"
+                            domain="[('is_magento_product', '=', True)]"/>
+                    <filter string="# Not From Magento" name="is_magento_product"
+                            domain="[('is_magento_product', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

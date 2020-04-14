@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="popup_dialog_form" model="ir.ui.view">
+            <field name="name">popup.dialog.form</field>
+            <field name="model">popup.dialog</field>
+            <field name="arch" type="xml">
+                <form string="Successful" edit="false">
+                    <h3>
+                        <field name="message" nolabel="1"/>
+                    </h3>
+                    <footer>
+                        <button string="Close" class="btn-primary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

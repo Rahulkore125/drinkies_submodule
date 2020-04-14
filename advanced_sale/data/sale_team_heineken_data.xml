@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="sale" model="crm.team">
+            <field name="name">Drinkies</field>
+        </record>
+        <record id="shopee" model="crm.team">
+            <field name="name">Shopee</field>
+        </record>
+         <record id="pos" model="crm.team">
+            <field name="name">POS</field>
+        </record>
+         <record id="lazmall" model="crm.team">
+            <field name="name">Lazmall</field>
+        </record>
+         <record id="lalafood" model="crm.team">
+            <field name="name">Lalafood</field>
+        </record>
+        <record id="food_panda" model="crm.team">
+            <field name="name">Food panda</field>
+        </record>
+        <record id="grab" model="crm.team">
+            <field name="name">Grab</field>
+        </record>
+
+<!--        <delete model="crm.team" search="[('id','=',ref('sales_team.team_sales_department'))]"/>-->
+<!--        <delete model="crm.team" search="[('id','=',ref('sales_team.crm_team_1'))]"/>-->
+<!--        <delete model="crm.team" search="[('id','=',ref('sales_team.salesteam_website_sales'))]"/>-->
+    </data>
+</odoo>

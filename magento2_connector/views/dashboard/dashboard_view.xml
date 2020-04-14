@@ -1,0 +1,158 @@
+<odoo>
+    <record id="magento_backend_dashboard_kanban_view" model="ir.ui.view">
+        <field name="name">magento.backend.dashboard.kanban</field>
+        <field name="model">magento.backend</field>
+        <field name="arch" type="xml">
+            <kanban create="false" class="oe_background_grey o_kanban_dashboard o_account_kanban">
+                <field name="name"/>
+                <field name="color"/>
+                <field name="kanban_dashboard"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)}">
+                            <t t-value="JSON.parse(record.kanban_dashboard.raw_value)" t-set="dashboard"/>
+                            <t t-call="MagentoBackendTop"/>
+                            <div class="container o_kanban_card_content">
+                                <div class="row">
+                                    <t t-call="MagentoBackendBodySalePurchase"/>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                <t t-call="MagentoBackendManage"/>
+                            </div>
+                        </div>
+                    </t>
+
+                    <t t-name="MagentoBackendTop">
+                        <div t-attf-class="o_kanban_card_header">
+                            <div class="o_kanban_card_header_title">
+                                <div class="o_primary">
+                                    <a type="action" name="%(magento_config_instance_action)d">
+                                        <field name="name"/>
+                                    </a>
+                                </div>
+                                <div class="o_secondary" t-att-title="dashboard.title">
+                                    <!--<field name="type"/>-->
+                                    <span>Magento Backend</span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_manage_button_section">
+                                <a class="o_kanban_manage_toggle_button" href="#">
+                                    <i class="fa fa-ellipsis-v" aria-label="Selection" role="img" title="Selection"/>
+                                </a>
+                            </div>
+                        </div>
+                    </t>
+
+                    <t t-name="MagentoBackendManage">
+                        <div class="row">
+                            <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                <div class="o_kanban_card_manage_title">
+                                    <span>Orders</span>
+                                </div>
+                                <div>
+                                    <a type="action" name="%(action_quotation_orders)d">
+                                        <t t-esc="dashboard.number_quotation"/>
+                                        Quotation
+                                    </a>
+                                </div>
+                                <div>
+                                    <a type="action" name="%(action_sale_orders)d">
+                                        <t t-esc="dashboard.number_sale_order"/>
+                                        Sale Orders
+                                    </a>
+                                </div>
+                                <div>
+                                    <a type="action" name="%(action_done_orders)d">
+                                        <t t-esc="dashboard.number_done"/>
+                                        Done
+                                    </a>
+                                </div>
+                                <div>
+                                    <a type="action" name="%(action_cancel_orders)d">
+                                        <t t-esc="dashboard.number_cancel"/>
+                                        Cancel
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-4 o_kanban_card_manage_section o_kanban_manage_reports">
+                                <div class="o_kanban_card_manage_title">
+                                    <span>Others</span>
+                                </div>
+                                <div>
+                                    <a type="action" name="%(action_domain_partner_form)d">
+                                        <t t-esc="dashboard.number_customer"/>
+                                        Customers
+                                    </a>
+                                    <a type="action" name="%(magento_product_act)d">
+                                        <t t-esc="dashboard.number_product"/>
+                                        Products
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="widget.editable" class="o_kanban_card_manage_settings row">
+                            <div class="col-8">
+                                <ul class="oe_kanban_colorpicker" data-field="color"/>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="MagentoBackendBodySalePurchase">
+                        <div class="col-5 o_kanban_primary_left">
+                            <t>
+                                <button type="action" name="%(magento_operation_quickly_action)d"
+                                        class="btn btn-primary ">
+                                    <span>Perform Operation</span>
+                                </button>
+                            </t>
+                        </div>
+                        <div class="col-7 o_kanban_primary_right">
+                            <div class="row">
+                                <div class="col-7">
+                                    <a type="action" name="%(action_magento_website)d">
+                                        <span title="website">
+                                            <t t-esc="dashboard.number_website"/>
+                                            Website
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-7">
+                                    <a type="action" name="%(action_magento_store)d">
+                                        <span title="store">
+                                            <t t-esc="dashboard.number_store"/>
+                                            Store
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-7">
+                                    <a type="action" name="%(action_magento_storeview)d">
+                                        <t t-esc="dashboard.number_store_view"/>
+                                        Storeview
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="open_magento_backend_dashboard_kanban" model="ir.actions.act_window">
+        <field name="name">Magento Connector Overview</field>
+        <field name="res_model">magento.backend</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="magento_backend_dashboard_kanban_view"/>
+    </record>
+
+    <menuitem id="menu_board_journal_2" name="Dashboard" action="open_magento_backend_dashboard_kanban"
+              parent="magento_odoo_connector_root" sequence="1"/>
+</odoo>

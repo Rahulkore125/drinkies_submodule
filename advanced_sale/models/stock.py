@@ -1,7 +1,8 @@
-from datetime import date
-
+from datetime import date, datetime
+from ...magento2_connector.utils.magento.rest import Client
 from odoo import fields, models, api
-
+from odoo.exceptions import UserError
+from odoo import tools, _
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -58,6 +59,71 @@ class StockReturnPicking(models.TransientModel):
                     'updated_qty': True,
                     'original_qty': stock_quant.quantity + e.product_uom_qty * e.product_id.deduct_amount_parent_product
                 })
+
+        products = self.env['product.product'].search([])
+        self.env['product.product'].browse(products.ids)._compute_quantities_dict(
+            self._context.get('lot_id'),
+            self._context.get(
+                'owner_id'),
+            self._context.get(
+                'package_id'),
+            self._context.get(
+                'from_date'),
+            to_date=datetime.today())
+        multiple_stock_sku = {}
+        for e in picking.sale_id.order_line:
+            if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                    if e.product_id.product_tmpl_id.id in multiple_stock_sku:
+                        pass
+                    else:
+                        multiple_stock_sku[e.product_id.product_tmpl_id.id] = e.product_id.product_tmpl_id
+            else:
+                magento_backend = self.env['magento.backend'].search([])
+                stock_quant = self.env['stock.quant'].search(
+                    [('product_id', '=', e.product_id.id), ('location_id', '=', self.location_id.id)])
+                if e.product_id.is_magento_product and self.location_id.is_from_magento:
+                    try:
+                        params = {
+                            "sourceItems": [
+                                {
+                                    "sku": e.product_id.default_code,
+                                    "source_code": self.location_id.magento_source_code,
+                                    "quantity": stock_quant.quantity,
+                                    "status": 1
+                                }
+                            ]
+                        }
+                        client = Client(magento_backend.web_url, magento_backend.access_token, True)
+                        client.post('rest/V1/inventory/source-items', arguments=params)
+                    except Exception as a:
+                        raise UserError(('Can not update quantity product on source magento - %s') % tools.ustr(a))
+        if len(multiple_stock_sku) > 0:
+            for e in multiple_stock_sku:
+                stock_quant = self.env['stock.quant'].search(
+                    [('product_id', '=', multiple_stock_sku[e].variant_manage_stock.id),
+                     ('location_id', '=', self.location_id.id)])
+                magento_backend = self.env['magento.backend'].search([])
+                for f in multiple_stock_sku[e].product_variant_ids:
+                    if f.is_magento_product and self.location_id.is_from_magento:
+                        try:
+                            params = {
+                                "sourceItems": [
+                                    {
+                                        "sku": f.default_code,
+                                        "source_code": self.location_id.magento_source_code,
+                                        "quantity": stock_quant.quantity * multiple_stock_sku[e].variant_manage_stock.deduct_amount_parent_product / f.deduct_amount_parent_product,
+                                        "status": 1
+                                    }
+                                ]
+                            }
+                            client = Client(magento_backend.web_url, magento_backend.access_token, True)
+                            print(123)
+                            client.post('rest/V1/inventory/source-items', arguments=params)
+
+                        except Exception as a:
+                            raise UserError(
+                                ('Can not update quantity product on source magento - %s') % tools.ustr(a))
         return action
 
 

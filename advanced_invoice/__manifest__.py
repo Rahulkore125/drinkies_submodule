@@ -23,7 +23,8 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/res_config_settings_views.xml'
+        'views/res_config_settings_views.xml',
+        'views/account_invoice_inherit_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

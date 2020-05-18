@@ -92,6 +92,10 @@
                     <div name="location_selection">
                         <field name="location_id" required="1" options='{"no_create": True}'/>
                     </div>
+                    <label for="user_related" groups="base.group_system"/>
+                    <div name="user_related_selection" groups="base.group_system">
+                        <field name="user_related" readonly="1"/>
+                    </div>
                 </xpath>
                 <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
                     <attribute name="context">{'default_type':'invoice', 'show_address': 1}</attribute>

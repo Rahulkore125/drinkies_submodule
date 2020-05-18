@@ -27,6 +27,19 @@ class SaleOrder(models.Model):
                                   default=lambda self: self.env.user.company_id.currency_id)
     location_id = fields.Many2one('stock.location', string="Location", domain=[('is_from_magento', '=', True)])
 
+    # owner location can see own SO, invoice
+    user_related = fields.Many2one(string="Owner location", comodel_name="res.users", compute="compute_user_related", store=True)
+
+    @api.depends('location_id')
+    def compute_user_related(self):
+        for rec in self:
+            rec.user_related = False
+            if rec.location_id:
+                if rec.location_id.partner_id:
+                    user_related = self.env['res.users'].sudo().search([('partner_id', '=', rec.location_id.partner_id.id)], limit=1)
+                    if user_related:
+                        rec.user_related = user_related
+
     @api.depends('picking_ids')
     def _compute_has_a_delivery(self):
         for order in self:

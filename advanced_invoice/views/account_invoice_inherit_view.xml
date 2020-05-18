@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="invoice_form_inherit_for_owner_location" model="ir.ui.view">
+            <field name="name">account.invoice.form.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="user_related" readonly="1" groups="base.group_system"/>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

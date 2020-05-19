@@ -80,7 +80,7 @@ class Order(Client):
                 # odoo
                 partner_id = context.env.ref('magento2_connector.create_customer_guest').id
 
-                if order['customer_group_id'] == 0:
+                if 'customer_group_id' in order and order['customer_group_id'] == 0:
                     customers = []
                     # billing_address
                     billing_address = order['billing_address']
@@ -136,7 +136,7 @@ class Order(Client):
                         if current_partner and len(current_partner) > 0:
                             partner_id = current_partner[0]
 
-                    if 'customer_address_id' in order['billing_address']:
+                    if 'billing_address' in order and 'customer_address_id' in order['billing_address']:
                         if 'customer_id' in order:
                             address_id = order['customer_id']
                         else:
@@ -165,22 +165,23 @@ class Order(Client):
                             customers.append(billing_address_data)
 
                     else:
-                        billing_address = order['billing_address']
-                        if 'region' not in billing_address:
-                            billing_address['region'] = 0
-                        if 'region_code' not in billing_address:
-                            billing_address['region_code'] = 0
-                        billing_address_state_id = get_state_id(billing_address['region'],
-                                                                billing_address['region_code'],
-                                                                context)
-                        billing_address_country_id = get_country_id(billing_address['country_id'], context)
-                        billing_address_data = (
-                            billing_address['firstname'] + " " + billing_address['lastname'],
-                            billing_address['street'][0],
-                            billing_address['postcode'], billing_address['city'], billing_address_state_id,
-                            billing_address_country_id,
-                            billing_address['email'], billing_address['telephone'], True, 'invoice')
-                        customers.append(billing_address_data)
+                        if 'billing_address' in order:
+                            billing_address = order['billing_address']
+                            if 'region' not in billing_address:
+                                billing_address['region'] = 0
+                            if 'region_code' not in billing_address:
+                                billing_address['region_code'] = 0
+                            billing_address_state_id = get_state_id(billing_address['region'],
+                                                                    billing_address['region_code'],
+                                                                    context)
+                            billing_address_country_id = get_country_id(billing_address['country_id'], context)
+                            billing_address_data = (
+                                billing_address['firstname'] + " " + billing_address['lastname'],
+                                billing_address['street'][0],
+                                billing_address['postcode'], billing_address['city'], billing_address_state_id,
+                                billing_address_country_id,
+                                billing_address['email'], billing_address['telephone'], True, 'invoice')
+                            customers.append(billing_address_data)
 
                     # address shipping
                     if 'customer_address_id' in order['extension_attributes']['shipping_assignments'][0]['shipping'][
@@ -459,12 +460,13 @@ class Order(Client):
                         else:
                             partner_id = partner_invoice_id
 
-                    #add source on sale order
+                    # add source on sale order
                     if 'order_source_code' in order['extension_attributes']:
                         source = context.env['stock.location'].search(
                             [('magento_source_code', '=', order['extension_attributes']['order_source_code'])])
                     else:
                         source = False
+                    default_location = context.env['stock.location'].sudo().search([('magento_source_code', '=', 'default')], limit=1)
                     sale_orders.append({'information':
                                             {'name': name,
                                              'partner_id': partner_id,
@@ -479,7 +481,7 @@ class Order(Client):
                                              'is_magento_sale_order': True,
                                              'currency_id': currency,
                                              'payment_method': payment_method,
-                                             'location_id': source.id if len(source) > 0 else False
+                                             'location_id': source.id if source else (default_location.id if default_location else False)
                                              # 'note': ("Apply discount code:" + str(coupon_code)) if coupon_code != '' else None
                                              },
                                         'status': state

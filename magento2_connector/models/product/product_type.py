@@ -36,23 +36,45 @@ class ProductType(models.Model):
     def import_image(self):
         for rec in self:
             if rec.is_magento_product:
-                backend_id = rec.product_variant_ids[0].magento_bind_ids[0].backend_id
-                url = backend_id.web_url
-                access_token = backend_id.access_token
-                sku = rec.default_code
-                client = Client(url, access_token)
-                if str(sku) != '':
-                    gallery = client.call('rest/V1/products/' + str(sku) + '/media', '')
-                    if len(gallery) > 0:
-                        file = gallery[0]['file']
-                        link = url + '/media/catalog/product' + file
-                        try:
-                            if link:
-                                req = Request(link, headers={'User-Agent': 'Mozilla/5.0'})
-                                profile_image = base64.encodebytes(urlopen(req).read())
-                                val = {
-                                    'image_medium': profile_image,
-                                }
-                                rec.image_small = profile_image
-                        except:
-                            raise UserError(_('Please provide correct URL or check your image size.!'))
+                if rec.product_variant_ids and rec.product_variant_ids[0].magento_bind_ids:
+                    backend_id = rec.product_variant_ids[0].magento_bind_ids[0].backend_id
+                    url = backend_id.web_url
+                    access_token = backend_id.access_token
+                    sku = rec.default_code
+                    client = Client(url, access_token)
+                    if str(sku) != '':
+                        gallery = client.call('rest/V1/products/' + str(sku) + '/media', '')
+                        if len(gallery) > 0:
+                            file = gallery[0]['file']
+                            link = url + '/media/catalog/product' + file
+                            try:
+                                if link:
+                                    req = Request(link, headers={'User-Agent': 'Mozilla/5.0'})
+                                    profile_image = base64.encodebytes(urlopen(req).read())
+                                    val = {
+                                        'image_medium': profile_image,
+                                    }
+                                    rec.image_small = profile_image
+                            except:
+                                raise UserError(_('Please provide correct URL or check your image size.!'))
+                else:
+                    backend_id = self.env['magento.backend'].sudo().search([], limit=1)
+                    url = backend_id.web_url
+                    access_token = backend_id.access_token
+                    sku = rec.default_code
+                    client = Client(url, access_token)
+                    if str(sku) != '':
+                        gallery = client.call('rest/V1/products/' + str(sku) + '/media', '')
+                        if len(gallery) > 0:
+                            file = gallery[0]['file']
+                            link = url + '/media/catalog/product' + file
+                            try:
+                                if link:
+                                    req = Request(link, headers={'User-Agent': 'Mozilla/5.0'})
+                                    profile_image = base64.encodebytes(urlopen(req).read())
+                                    val = {
+                                        'image_medium': profile_image,
+                                    }
+                                    rec.image_small = profile_image
+                            except:
+                                raise UserError(_('Please provide correct URL or check your image size.!'))

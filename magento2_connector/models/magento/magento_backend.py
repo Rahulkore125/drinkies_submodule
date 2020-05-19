@@ -597,7 +597,7 @@ class MagentoBackend(models.Model):
                     })
                     orders_pull = order.list(page_size, current_page)
                     orders = []
-                    for e in orders_pull:
+                    for e in orders_pull['items']:
                         orders.append(e)
 
                 total_amount = len(orders)
@@ -904,232 +904,240 @@ class MagentoBackend(models.Model):
         # payment_journal = self.payment_journal.id
         pull_history = self.env['magento.pull.history'].search(
             [('backend_id', '=', backend_id), ('name', '=', 'sale_orders')])
-        time_pull = datetime(pull_history.sync_date.year, month=pull_history.sync_date.month,
-                             day=pull_history.sync_date.day, hour=00, minute=00, second=00)
-        orders_updated = order.list_order_updated_at_after_sync(time_pull)
+        if pull_history:
+            time_pull = datetime(pull_history.sync_date.year, month=pull_history.sync_date.month,
+                                 day=pull_history.sync_date.day, hour=00, minute=00, second=00)
+            orders_updated = order.list_order_updated_at_after_sync(time_pull)
+            # else:
+            #     # first pull
+            #     self.env['magento.pull.history'].create({
+            #         'name': 'sale_orders',
+            #         'sync_date': datetime.today(),
+            #         'backend_id': backend_id
+            #     })
+            #     orders_updated = order.list(currentPage=, pageSize=self.sale_orders_pageSize)
 
-        for e in orders_updated['items']:
-            exist_order = self.env['magento.sale.order'].search([('external_id', '=', e['entity_id'])])
-            if len(exist_order) == 0:
-                pass
-            else:
-                if e['state'] == 'complete' and exist_order.state in ['processing', 'shipping']:
+            for e in orders_updated['items']:
+                exist_order = self.env['magento.sale.order'].search([('external_id', '=', e['entity_id'])])
+                if len(exist_order) == 0:
+                    pass
+                else:
+                    if e['state'] == 'complete' and exist_order.state in ['processing', 'shipping']:
 
-                    for stock_picking in exist_order.picking_ids:
-                        if stock_picking.state != 'done':
-                            stock_picking.action_cancel()
-                    for invoice in exist_order.invoice_ids:
-                        if invoice.state == 'open':
-                            if exist_order.payment_method == 'cod':
-                                journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
-                            elif exist_order.payment_method == 'online_payment':
-                                journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
-                            payment = self.env['account.payment'].create({
-                                'invoice_ids': [(4, invoice.id, None)],
-                                'amount': invoice.amount_total,
-                                'payment_date': date.today(),
-                                'communication': invoice.number,
-                                'payment_type': 'inbound',
-                                'journal_id': journal_id,
-                                'partner_type': 'customer',
-                                'payment_method_id': 1,
-                                'partner_id': invoice.partner_id.id
-                            })
-                            payment.action_validate_invoice_payment()
-                    exist_order.write({
-                        'state': 'complete',
-                        'status': 'complete'
-                    })
-                    self.env.cr.execute(
-                        """UPDATE sale_order SET state = %s WHERE id = %s""", ('done', exist_order.odoo_id.id))
-                elif e['state'] == 'canceled' and exist_order.state in ['processing', 'shipping']:
-                    # self.fetch_shipments()
-                    # self.fetch_invoice()
-                    for stock_picking in exist_order.picking_ids:
-                        if stock_picking.state != 'done':
-                            stock_picking.action_cancel()
-                        elif stock_picking.state == 'done':
-                            new_picking_id, pick_type_id = self.env['stock.return.picking'].with_context(
-                                active_model='stock.picking', active_id=stock_picking.id).create({})._create_returns()
+                        for stock_picking in exist_order.picking_ids:
+                            if stock_picking.state != 'done':
+                                stock_picking.action_cancel()
+                        for invoice in exist_order.invoice_ids:
+                            if invoice.state == 'open':
+                                if exist_order.payment_method == 'cod':
+                                    journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
+                                elif exist_order.payment_method == 'online_payment':
+                                    journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
+                                payment = self.env['account.payment'].create({
+                                    'invoice_ids': [(4, invoice.id, None)],
+                                    'amount': invoice.amount_total,
+                                    'payment_date': date.today(),
+                                    'communication': invoice.number,
+                                    'payment_type': 'inbound',
+                                    'journal_id': journal_id,
+                                    'partner_type': 'customer',
+                                    'payment_method_id': 1,
+                                    'partner_id': invoice.partner_id.id
+                                })
+                                payment.action_validate_invoice_payment()
+                        exist_order.write({
+                            'state': 'complete',
+                            'status': 'complete'
+                        })
+                        self.env.cr.execute(
+                            """UPDATE sale_order SET state = %s WHERE id = %s""", ('done', exist_order.odoo_id.id))
+                    elif e['state'] == 'canceled' and exist_order.state in ['processing', 'shipping']:
+                        # self.fetch_shipments()
+                        # self.fetch_invoice()
+                        for stock_picking in exist_order.picking_ids:
+                            if stock_picking.state != 'done':
+                                stock_picking.action_cancel()
+                            elif stock_picking.state == 'done':
+                                new_picking_id, pick_type_id = self.env['stock.return.picking'].with_context(
+                                    active_model='stock.picking', active_id=stock_picking.id).create({})._create_returns()
 
-                            ctx = dict(self.env.context)
+                                ctx = dict(self.env.context)
 
-                            ctx.update({
-                                'search_default_picking_type_id': pick_type_id,
-                                'search_default_draft': False,
-                                'search_default_assigned': False,
-                                'search_default_confirmed': False,
-                                'search_default_ready': False,
-                                'search_default_late': False,
-                                'search_default_available': False,
-                            })
+                                ctx.update({
+                                    'search_default_picking_type_id': pick_type_id,
+                                    'search_default_draft': False,
+                                    'search_default_assigned': False,
+                                    'search_default_confirmed': False,
+                                    'search_default_ready': False,
+                                    'search_default_late': False,
+                                    'search_default_available': False,
+                                })
 
-                            picking = self.env['stock.picking'].search([('id', '=', new_picking_id)])
+                                picking = self.env['stock.picking'].search([('id', '=', new_picking_id)])
 
-                            if 'order_source_code' in e['extension_attributes']:
-                                source = self.env['stock.location'].search(
-                                    [('magento_source_code', '=', e['extension_attributes']['order_source_code'])])
-                            else:
-                                source = []
-
-                            for move_line in picking.move_lines:
-                                move_line.quantity_done = move_line.product_uom_qty
-
-                            for move_line_id in picking.move_line_ids:
-                                if len(source) > 0:
-                                    move_line_id.location_dest_id = source.id
-
-                            picking.action_done()
-                            picking.is_return_picking = True
-
-                            picking.date_return = date.today()
-
-                            origin_picking = self.env['stock.picking'].search(
-                                [('id', '=', stock_picking.id)])
-                            origin_picking.has_return_picking = True
-
-                            for e in picking.move_ids_without_package:
-                                if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                                    stock_quant = self.env['stock.quant'].search(
-                                        [('location_id', '=', picking.location_dest_id.id),
-                                         ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-
-                                    stock_quant.sudo().write({
-                                        'updated_qty': True,
-                                        'original_qty': stock_quant.quantity + e.product_uom_qty * e.product_id.deduct_amount_parent_product
-                                    })
-                            products = self.env['product.product'].search([])
-                            self.env['product.product'].browse(products.ids)._compute_quantities_dict(
-                                self._context.get('lot_id'),
-                                self._context.get(
-                                    'owner_id'),
-                                self._context.get(
-                                    'package_id'),
-                                self._context.get(
-                                    'from_date'),
-                                to_date=datetime.today())
-                            multiple_stock_sku = {}
-                            for e in picking.sale_id.order_line:
-                                if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                                    if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                                        if e.product_id.product_tmpl_id.id in multiple_stock_sku:
-                                            pass
-                                        else:
-                                            multiple_stock_sku[
-                                                e.product_id.product_tmpl_id.id] = e.product_id.product_tmpl_id
+                                if 'order_source_code' in e['extension_attributes']:
+                                    source = self.env['stock.location'].search(
+                                        [('magento_source_code', '=', e['extension_attributes']['order_source_code'])])
                                 else:
-                                    magento_backend = self.env['magento.backend'].search([])
-                                    stock_quant = self.env['stock.quant'].search(
-                                        [('product_id', '=', e.product_id.id),
-                                         ('location_id', '=', picking.sale_id.location_id.id)])
-                                    if e.product_id.is_magento_product and self.location_id.is_from_magento:
-                                        try:
-                                            params = {
-                                                "sourceItems": [
-                                                    {
-                                                        "sku": e.product_id.default_code,
-                                                        "source_code": picking.sale_id.location_id.magento_source_code,
-                                                        "quantity": stock_quant.quantity,
-                                                        "status": 1
-                                                    }
-                                                ]
-                                            }
-                                            client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                                            client.post('rest/V1/inventory/source-items', arguments=params)
-                                        except Exception as a:
-                                            raise UserError(
-                                                ('Can not update quantity product on source magento - %s') % tools.ustr(
-                                                    a))
-                            if len(multiple_stock_sku) > 0:
-                                for e in multiple_stock_sku:
-                                    stock_quant = self.env['stock.quant'].search(
-                                        [('product_id', '=', multiple_stock_sku[e].variant_manage_stock.id),
-                                         ('location_id', '=', picking.sale_id.location_id.id)])
-                                    magento_backend = self.env['magento.backend'].search([])
-                                    for f in multiple_stock_sku[e].product_variant_ids:
-                                        if f.is_magento_product and picking.sale_id.location_id.is_from_magento:
+                                    source = []
+
+                                for move_line in picking.move_lines:
+                                    move_line.quantity_done = move_line.product_uom_qty
+
+                                for move_line_id in picking.move_line_ids:
+                                    if len(source) > 0:
+                                        move_line_id.location_dest_id = source.id
+
+                                picking.action_done()
+                                picking.is_return_picking = True
+
+                                picking.date_return = date.today()
+
+                                origin_picking = self.env['stock.picking'].search(
+                                    [('id', '=', stock_picking.id)])
+                                origin_picking.has_return_picking = True
+
+                                for e in picking.move_ids_without_package:
+                                    if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                                        stock_quant = self.env['stock.quant'].search(
+                                            [('location_id', '=', picking.location_dest_id.id),
+                                             ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
+
+                                        stock_quant.sudo().write({
+                                            'updated_qty': True,
+                                            'original_qty': stock_quant.quantity + e.product_uom_qty * e.product_id.deduct_amount_parent_product
+                                        })
+                                products = self.env['product.product'].search([])
+                                self.env['product.product'].browse(products.ids)._compute_quantities_dict(
+                                    self._context.get('lot_id'),
+                                    self._context.get(
+                                        'owner_id'),
+                                    self._context.get(
+                                        'package_id'),
+                                    self._context.get(
+                                        'from_date'),
+                                    to_date=datetime.today())
+                                multiple_stock_sku = {}
+                                for e in picking.sale_id.order_line:
+                                    if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                                        if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                                            if e.product_id.product_tmpl_id.id in multiple_stock_sku:
+                                                pass
+                                            else:
+                                                multiple_stock_sku[
+                                                    e.product_id.product_tmpl_id.id] = e.product_id.product_tmpl_id
+                                    else:
+                                        magento_backend = self.env['magento.backend'].search([])
+                                        stock_quant = self.env['stock.quant'].search(
+                                            [('product_id', '=', e.product_id.id),
+                                             ('location_id', '=', picking.sale_id.location_id.id)])
+                                        if e.product_id.is_magento_product and self.location_id.is_from_magento:
                                             try:
                                                 params = {
                                                     "sourceItems": [
                                                         {
-                                                            "sku": f.default_code,
+                                                            "sku": e.product_id.default_code,
                                                             "source_code": picking.sale_id.location_id.magento_source_code,
-                                                            "quantity": stock_quant.quantity * multiple_stock_sku[
-                                                                e].variant_manage_stock.deduct_amount_parent_product / f.deduct_amount_parent_product,
+                                                            "quantity": stock_quant.quantity,
                                                             "status": 1
                                                         }
                                                     ]
                                                 }
-                                                client = Client(magento_backend.web_url, magento_backend.access_token,
-                                                                True)
-
+                                                client = Client(magento_backend.web_url, magento_backend.access_token, True)
                                                 client.post('rest/V1/inventory/source-items', arguments=params)
-
                                             except Exception as a:
                                                 raise UserError(
-                                                    (
-                                                        'Can not update quantity product on source magento - %s') % tools.ustr(
+                                                    ('Can not update quantity product on source magento - %s') % tools.ustr(
                                                         a))
+                                if len(multiple_stock_sku) > 0:
+                                    for e in multiple_stock_sku:
+                                        stock_quant = self.env['stock.quant'].search(
+                                            [('product_id', '=', multiple_stock_sku[e].variant_manage_stock.id),
+                                             ('location_id', '=', picking.sale_id.location_id.id)])
+                                        magento_backend = self.env['magento.backend'].search([])
+                                        for f in multiple_stock_sku[e].product_variant_ids:
+                                            if f.is_magento_product and picking.sale_id.location_id.is_from_magento:
+                                                try:
+                                                    params = {
+                                                        "sourceItems": [
+                                                            {
+                                                                "sku": f.default_code,
+                                                                "source_code": picking.sale_id.location_id.magento_source_code,
+                                                                "quantity": stock_quant.quantity * multiple_stock_sku[
+                                                                    e].variant_manage_stock.deduct_amount_parent_product / f.deduct_amount_parent_product,
+                                                                "status": 1
+                                                            }
+                                                        ]
+                                                    }
+                                                    client = Client(magento_backend.web_url, magento_backend.access_token,
+                                                                    True)
 
+                                                    client.post('rest/V1/inventory/source-items', arguments=params)
 
-                    refund = self.env['account.invoice.refund'].create({
-                        'filter_refund': 'refund',
-                        'description': 'Return product',
-                        'date_invoice': date.today(),
-                    })
+                                                except Exception as a:
+                                                    raise UserError(
+                                                        (
+                                                            'Can not update quantity product on source magento - %s') % tools.ustr(
+                                                            a))
 
-                    invoice = self.env['account.invoice'].search([('original_invoice', '=', True), (
-                        'order_id', '=', exist_order.odoo_id.id)])
-                    invoice_lines = invoice.invoice_line_ids
-
-                    invoice_lines_update = []
-                    invoice_lines_copy = {}
-                    for e in invoice_lines:
-                        invoice_copy = e.copy()
-                        invoice_copy.write({'invoice_id': False})
-                        invoice_copy.write({
-                            'quantity': e.quantity
+                        refund = self.env['account.invoice.refund'].create({
+                            'filter_refund': 'refund',
+                            'description': 'Return product',
+                            'date_invoice': date.today(),
                         })
-                        invoice_lines_update.append(invoice_copy.id)
-                    # invoice_lines_update = []
-                    # for e in self.product_return_moves:
-                    #     if e.product_id.id in invoice_lines_copy:
-                    #         invoice_lines_copy[e.product_id.id].write({
-                    #             'quantity': e.quantity
-                    #         })
-                    #         invoice_lines_update.append(invoice_lines_copy[e.product_id.id].id)
 
-                    refund.with_context({'active_ids': [invoice.id]}).compute_refund(mode='refund')
-                    credit_note = self.env['account.invoice'].search([('refund_invoice_id', '=', invoice.id)])
-                    for e in credit_note:
-                        if e.state != 'paid':
-                            # e.invoice_line_ids = invoice_lines
-                            e.write({
-                                'invoice_line_ids': [(6, 0, invoice_lines_update)]
+                        invoice = self.env['account.invoice'].search([('original_invoice', '=', True), (
+                            'order_id', '=', exist_order.odoo_id.id)])
+                        invoice_lines = invoice.invoice_line_ids
+
+                        invoice_lines_update = []
+                        invoice_lines_copy = {}
+                        for e in invoice_lines:
+                            invoice_copy = e.copy()
+                            invoice_copy.write({'invoice_id': False})
+                            invoice_copy.write({
+                                'quantity': e.quantity
                             })
-                            e.action_invoice_open()
-                            if exist_order.payment_method == 'cod':
-                                journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
-                            elif exist_order.payment_method == 'online_payment':
-                                journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
-                            payment = self.env['account.payment'].create({
-                                'invoice_ids': [(4, e.id, None)],
-                                'amount': e.amount_total,
-                                'payment_date': date.today(),
-                                'communication': e.number,
-                                'payment_type': 'outbound',
-                                'journal_id': journal_id,
-                                'partner_type': 'customer',
-                                'payment_method_id': 1,
-                                'partner_id': e.partner_id.id
-                            })
-                            payment.action_validate_invoice_payment()
-                    exist_order.write({
-                        'state': 'canceled',
-                        'status': 'canceled'
-                    })
-                    self.env.cr.execute(
-                        """UPDATE sale_order SET state = %s WHERE id = %s""", ('cancel', exist_order.odoo_id.id))
+                            invoice_lines_update.append(invoice_copy.id)
+                        # invoice_lines_update = []
+                        # for e in self.product_return_moves:
+                        #     if e.product_id.id in invoice_lines_copy:
+                        #         invoice_lines_copy[e.product_id.id].write({
+                        #             'quantity': e.quantity
+                        #         })
+                        #         invoice_lines_update.append(invoice_lines_copy[e.product_id.id].id)
+
+                        refund.with_context({'active_ids': [invoice.id]}).compute_refund(mode='refund')
+                        credit_note = self.env['account.invoice'].search([('refund_invoice_id', '=', invoice.id)])
+                        for e in credit_note:
+                            if e.state != 'paid':
+                                # e.invoice_line_ids = invoice_lines
+                                e.write({
+                                    'invoice_line_ids': [(6, 0, invoice_lines_update)]
+                                })
+                                e.action_invoice_open()
+                                if exist_order.payment_method == 'cod':
+                                    journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
+                                elif exist_order.payment_method == 'online_payment':
+                                    journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
+                                payment = self.env['account.payment'].create({
+                                    'invoice_ids': [(4, e.id, None)],
+                                    'amount': e.amount_total,
+                                    'payment_date': date.today(),
+                                    'communication': e.number,
+                                    'payment_type': 'outbound',
+                                    'journal_id': journal_id,
+                                    'partner_type': 'customer',
+                                    'payment_method_id': 1,
+                                    'partner_id': e.partner_id.id
+                                })
+                                payment.action_validate_invoice_payment()
+                        exist_order.write({
+                            'state': 'canceled',
+                            'status': 'canceled'
+                        })
+                        self.env.cr.execute(
+                            """UPDATE sale_order SET state = %s WHERE id = %s""", ('cancel', exist_order.odoo_id.id))
 
     def fetch_source(self):
         url = self.web_url

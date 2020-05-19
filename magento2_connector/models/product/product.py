@@ -11,7 +11,7 @@ class ProductProduct(models.Model):
         string='Magento Bindings Product',
     )
     magento_product_name = fields.Char('Magento Product Name', index=True, translate=True)
-    is_magento_product = fields.Boolean("Is Magento Product")
+    is_magento_product = fields.Boolean("Is Magento Product", related="product_tmpl_id.is_magento_product", store=True)
 
     magento_sale_price = fields.Float(
         'Magento Sale Price',

@@ -1162,8 +1162,8 @@ class MagentoBackend(models.Model):
             self = self.env['magento.backend'].search([], limit=1)
 
         # search and check if = false then run
-        self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
-        self.env.cr.commit()
+        # self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
+        # self.env.cr.commit()
         if not self.auto_fetching:
             print("start fetch at " + str(datetime.now()))
             self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = TRUE WHERE id = %s""", (self.id,))

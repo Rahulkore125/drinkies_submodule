@@ -578,7 +578,7 @@ class Order(Client):
                                     context.env.cr.execute(
                                         """INSERT INTO magento_address (odoo_id,magento_partner_id,backend_id) VALUES (%s,%s,%s)""",
                                         (current_partner_id, magento_partner_odoo_id, backend_id))
-
+            #todo xu ly cac SO bi cancel
             drinkies_sale_team = context.env.ref('advanced_sale.sale').id
             sale_order_ids = []
             sale_order_created = []
@@ -608,7 +608,6 @@ class Order(Client):
 
                 for e in sale_order_created:
                     e['information'].action_confirm()
-
                     context.env.cr.execute(
                         """UPDATE sale_order SET state = %s WHERE id = %s""", (str(e['status']), e['information'].id))
 

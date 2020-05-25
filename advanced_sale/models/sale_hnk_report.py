@@ -20,6 +20,7 @@ class SaleHnkReport(models.Model):
 
     def generate_report(self):
         a = self.env.user.tz_offset
+
         prefix = a.split('00')[0]
 
         if prefix[0] == '+':

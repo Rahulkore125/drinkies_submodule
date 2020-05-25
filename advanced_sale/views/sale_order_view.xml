@@ -20,9 +20,9 @@
                 <xpath expr="//field[@name='amount_untaxed']" position="after">
                     <field name="computed_discount_total"/>
                 </xpath>
-<!--                <xpath expr="//field[@name='amount_tax']" position="attributes">-->
-<!--                    <attribute name="invisible">1</attribute>-->
-<!--                </xpath>-->
+                <!--                <xpath expr="//field[@name='amount_tax']" position="attributes">-->
+                <!--                    <attribute name="invisible">1</attribute>-->
+                <!--                </xpath>-->
                 <xpath expr="//tree/field[@name='discount']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
@@ -75,7 +75,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//button[@name='action_done']" position="attributes">
-                    <attribute name="invisible">1</attribute>
+                    <attribute name="invisible">0</attribute>
                 </xpath>
                 <xpath expr="//field[@name='state']" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -88,9 +88,10 @@
                     <div name="shipper_selection">
                         <field name="shipper"/>
                     </div>
-                     <label for="location_id"/>
+                    <label for="location_id"/>
                     <div name="location_selection">
-                        <field name="location_id" required="1" options='{"no_create": True}'/>
+                        <field name="location_id" required="1" options='{"no_create": True}'
+                               domain="[('magento_source_code','!=','default')]"/>
                     </div>
                     <label for="user_related" groups="base.group_system"/>
                     <div name="user_related_selection" groups="base.group_system">
@@ -98,10 +99,10 @@
                     </div>
                 </xpath>
                 <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
-                    <attribute name="context">{'default_type':'invoice', 'show_address': 1}</attribute>
+                    <attribute name="context">{'default_type': 'invoice', 'show_address': 1}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
-                    <attribute name="context">{'default_type':'delivery', 'show_address': 1}</attribute>
+                    <attribute name="context">{'default_type': 'delivery', 'show_address': 1}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='sale_order_template_id']" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -122,7 +123,20 @@
                 </xpath>
             </field>
         </record>
+        <!-- Inherit Form View to Modify it -->
+        <record id="sale_order_inherit_to_remove" model="ir.ui.view">
+            <field name="name">Sale Order Inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
 
+                <xpath expr="//field[@name='partner_invoice_id']" position="replace">
+                    <!-- Add your fields or attributes here -->
+                    <field name="partner_invoice_id" invisible="1"/>
+                </xpath>
+
+            </field>
+        </record>
         <record id="sale.action_orders" model="ir.actions.act_window">
             <field name="name">Sales Orders</field>
             <field name="type">ir.actions.act_window</field>
@@ -136,8 +150,9 @@
                 <p class="o_view_nocontent_smiling_face">
                     Create a new quotation, the first step of a new sale!
                 </p><p>
-                    Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
-                </p>
+                Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice
+                and collect the payment.
+            </p>
             </field>
         </record>
     </data>

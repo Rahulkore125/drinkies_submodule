@@ -155,7 +155,7 @@ class SaleOrder(models.Model):
                             except Exception as a:
                                 raise UserError(
                                     ('Can not update quantity product on source magento - %s') % tools.ustr(a))
-            return result
+        return result
 
     def _amount_all(self):
         """

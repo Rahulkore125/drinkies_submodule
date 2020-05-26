@@ -73,68 +73,15 @@ class Inventory(models.Model):
         return True
 
     def action_validate(self):
-        inventory_lines = self.line_ids.filtered(lambda l: l.product_id.tracking in ['lot',
-                                                                                     'serial'] and not l.prod_lot_id and l.theoretical_qty != l.product_qty)
-
-        lines = self.line_ids.filtered(lambda l: float_compare(l.product_qty, 1,
-                                                               precision_rounding=l.product_uom_id.rounding) > 0 and l.product_id.tracking == 'serial' and l.prod_lot_id)
-
-        if inventory_lines and not lines:
-            wiz_lines = [(0, 0, {'product_id': product.id, 'tracking': product.tracking}) for product in
-                         inventory_lines.mapped('product_id')]
-            wiz = self.env['stock.track.confirmation'].create({'inventory_id': self.id, 'tracking_line_ids': wiz_lines})
-            return {
-                'name': _('Tracked Products in Inventory Adjustment'),
-                'type': 'ir.actions.act_window',
-                'view_mode': 'form',
-                'res_model': 'stock.track.confirmation',
-                'target': 'new',
-                'res_id': wiz.id,
-            }
-        else:
-            self._action_done()
-            magento_backend = self.env['magento.backend'].search([])
-            for e in self.line_ids:
-                if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                    if not self.update_to_magento:
-                        for f in e.product_id.product_tmpl_id.product_variant_ids:
-                            if f.is_magento_product and self.location_id.is_from_magento:
-                                try:
-                                    params = {
-                                        "sourceItems": [
-                                            {
-                                                "sku": f.default_code,
-                                                "source_code": self.location_id.magento_source_code,
-                                                "quantity": e.product_qty * e.product_id.deduct_amount_parent_product / f.deduct_amount_parent_product,
-                                                "status": 1
-                                            }
-                                        ]
-                                    }
-                                    client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                                    client.post('rest/V1/inventory/source-items', arguments=params)
-
-                                except Exception as a:
-                                    raise UserError(
-                                        ('Can not update quantity product on source magento - %s') % tools.ustr(a))
-                else:
-                    if e.product_id.is_magento_product and self.location_id.is_from_magento:
-                        try:
-                            params = {
-                                "sourceItems": [
-                                    {
-                                        "sku": e.product_id.default_code,
-                                        "source_code": self.location_id.magento_source_code,
-                                        "quantity": e.product_qty,
-                                        "status": 1
-                                    }
-                                ]
-                            }
-
-                            client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                            client.post('rest/V1/inventory/source-items', arguments=params)
-
-                        except Exception as a:
-                            raise UserError(('Can not update quantity product on source magento - %s') % tools.ustr(a))
+        res = super(Inventory, self).action_validate()
+        ## after action_done(), sync stock to magento
+        stock2magento = self.env['stock.to.magento']
+        magento_backend = self.env['magento.backend'].search([], limit=1)
+        client = Client(magento_backend.web_url, magento_backend.access_token, True)
+        for line in self.line_ids:
+            stock2magento.sync_quantity_to_magento(location_id=self.location_id,
+                                                   product_id=line.product_id, client=client)
+        return res
 
     def action_check(self):
         """ Checks the inventory and computes the stock move to do """

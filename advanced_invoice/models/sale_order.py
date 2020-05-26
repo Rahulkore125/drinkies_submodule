@@ -45,4 +45,4 @@ class SaleOrder(models.Model):
                     'partner_id': invoice.partner_id.id
                 })
                 payment.action_validate_invoice_payment()
-                return result
+            return result

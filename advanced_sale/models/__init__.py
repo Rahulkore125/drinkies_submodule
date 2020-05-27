@@ -4,3 +4,4 @@ from . import sale_hnk_report
 from . import sale_order
 from . import shipper
 from . import stock
+from . import sale_and_stock_report

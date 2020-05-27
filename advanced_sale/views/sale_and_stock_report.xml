@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sale_and_stock_report_view_tree" model="ir.ui.view">
+            <field name="name">sale_and_stock_report_view_tree</field>
+            <field name="model">sale.and.stock.report</field>
+            <field name="arch" type="xml">
+                <tree string="sale_and_stock_report_tree">
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="product_id"/>
+                    <field name="uom"/>
+                    <field name="location_id"/>
+                    <field name="team_id"/>
+                    <field name="payment_method"/>
+                    <field name="sold"/>
+                    <field name="amount" widget="monetary"/>
+                </tree>
+            </field>
+        </record>
+        <record id="sale_and_stock_report_search" model="ir.ui.view">
+            <field name="name">sale_and_stock_report_search</field>
+            <field name="model">sale.and.stock.report</field>
+            <field name="arch" type="xml">
+                <search string="">
+                    <field name="product_id"/>
+                    <field name="location_id"/>
+                    <field name="team_id"/>
+                    <field name="payment_method"/>
+                    <field name="is_heineken_product"/>
+                    <filter string="Heineken Product" name="is_heineken_product"
+                            domain="[('is_heineken_product','=', True)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Product" name="product_id" context="{'group_by': 'product_id'}"/>
+                        <filter string="Warehouse location" name="location_id" context="{'group_by': 'location_id'}"/>
+                        <filter string="Sale chanel" name="team_id" context="{'group_by': 'team_id'}"/>
+                        <filter string="Payment method" name="payment_method" context="{'group_by': 'payment_method'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

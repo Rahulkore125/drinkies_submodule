@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_and_stock_popup_view_form" model="ir.ui.view">
+            <field name="name">sale_and_stock_popup_view_form</field>
+            <field name="model">sale.and.stock.popup</field>
+            <field name="arch" type="xml">
+                <form string="sale_and_stock_popup_form">
+                    <sheet>
+                        <group>
+                            <field name="compute_at_date" widget="radio"/>
+                            <field name="date_report"
+                                   attrs="{'invisible': [('compute_at_date', '=', 1)], 'required': [('compute_at_date', '=', 0)]}"/>
+                            <field name="from_date_report"
+                                   attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
+                            <field name="to_date_report"
+                                   attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
+<!--                            <field name="product_test"/>-->
+                        </group>
+                        <footer>
+<!--                            <button name="generate_report_test" type="object" class="oe_highlight"-->
+<!--                                    string="Generate Report"/>-->
+                            <button name="generate_report" type="object" class="oe_highlight"
+                                    string="Generate Report"/>
+                            <button string="Discard" class="oe_highlight" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="sale_and_stock_popup_action" model="ir.actions.act_window">
+            <field name="name">Sale &amp; Stock Report 2</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.and.stock.popup</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="sale_and_stock_popup_report_menu" name="Sale &amp; Stock Report 2" parent="sale.menu_sale_report"
+                  action="sale_and_stock_popup_action" sequence="2"/>
+    </data>
+</odoo>

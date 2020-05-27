@@ -8,3 +8,4 @@ access_advanced_sale_sale_hnk_report,advanced_sale.sale_hnk_report,model_sale_hn
 access_advanced_sale_sale_hnk_report_line,advanced_sale.sale_hnk_report_line,model_sale_hnk_report_line,,1,1,1,1
 access_advanced_sale_shipper,access_advanced_sale_shipper,model_shipper,,1,1,1,1
 access_advanced_stock_quant,access_advanced_stock_quant,stock.model_stock_quant,,1,1,1,1
+access_sale_and_stock_report,access_sale_and_stock_report,advanced_sale.model_sale_and_stock_report,,1,1,1,1

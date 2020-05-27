@@ -29,13 +29,13 @@
             </field>
         </record>
         <record id="sale_and_stock_popup_action" model="ir.actions.act_window">
-            <field name="name">Sale &amp; Stock Report 2</field>
+            <field name="name">Sale 2</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">sale.and.stock.popup</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
-        <menuitem id="sale_and_stock_popup_report_menu" name="Sale &amp; Stock Report 2" parent="sale.menu_sale_report"
+        <menuitem id="sale_and_stock_popup_report_menu" name="Sale 2" parent="sale.menu_sale_report"
                   action="sale_and_stock_popup_action" sequence="2"/>
     </data>
 </odoo>

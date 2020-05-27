@@ -17,6 +17,7 @@ class SaleHnkReport(models.Model):
     report_line_ids = fields.One2many(comodel_name='sale.hnk.report.line', inverse_name='sale_report_id',
                                       string="Report Line")
     datetime_report = fields.Datetime(string="Datetime Report")
+    location_id = fields.Many2one('stock.location', domain="[('is_from_magento', '=', True)]")
 
     def generate_report(self):
         a = self.env.user.tz_offset
@@ -72,9 +73,8 @@ class SaleHnkReport(models.Model):
         heineken_product += magento_demo_service_product
         heineken_product += magento_demo_simple_product
 
-        print(previous_day_date)
-        print(datetime.now())
-        qty_previous_day = self.env['product.product'].browse(heineken_product.ids)._compute_quantities_dict(
+        qty_previous_day = self.with_context(location=self.location_id.id).env['product.product'].browse(
+            heineken_product.ids)._compute_quantities_dict(
             self._context.get('lot_id'),
             self._context.get(
                 'owner_id'),
@@ -86,7 +86,8 @@ class SaleHnkReport(models.Model):
 
         # todo chua xu ly truong hop cac mui gio am.
         # print(qty_previous_day)
-        qty_today = self.env['product.product'].browse(heineken_product.ids)._compute_quantities_dict(
+        qty_today = self.with_context(location=self.location_id.id).env['product.product'].browse(
+            heineken_product.ids)._compute_quantities_dict(
             self._context.get('lot_id'),
             self._context.get(
                 'owner_id'),

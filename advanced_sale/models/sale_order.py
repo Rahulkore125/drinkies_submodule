@@ -149,7 +149,7 @@ class SaleOrder(models.Model):
                                     ]
                                 }
                                 client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                                print(stock_quant.quantity * multiple_stock_sku[e].variant_manage_stock.deduct_amount_parent_product / f.deduct_amount_parent_product)
+
                                 client.post('rest/V1/inventory/source-items', arguments=params)
 
                             except Exception as a:

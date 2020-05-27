@@ -21,6 +21,7 @@
                             <field name="date_report" attrs="{'invisible': [('compute_at_date', '=', 1)], 'required': [('compute_at_date', '=', 0)]}"/>
                             <field name="from_date_report" attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
                             <field name="to_date_report" attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
+                            <field name="location_id" options='{"no_open": True, "no_create": True}'/>
                         </group>
                         <footer>
                             <button name="generate_report" type="object" class="oe_highlight"

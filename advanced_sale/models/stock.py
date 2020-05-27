@@ -118,7 +118,7 @@ class StockReturnPicking(models.TransientModel):
                                 ]
                             }
                             client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                            print(123)
+
                             client.post('rest/V1/inventory/source-items', arguments=params)
 
                         except Exception as a:

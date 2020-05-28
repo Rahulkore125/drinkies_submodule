@@ -28,7 +28,8 @@ class SaleOrder(models.Model):
     location_id = fields.Many2one('stock.location', string="Location", domain=[('is_from_magento', '=', True)])
 
     # owner location can see own SO, invoice
-    user_related = fields.Many2one(string="Owner location", comodel_name="res.users", compute="compute_user_related", store=True)
+    user_related = fields.Many2one(string="Owner location", comodel_name="res.users", compute="compute_user_related",
+                                   store=True)
 
     @api.depends('location_id')
     def compute_user_related(self):
@@ -36,7 +37,8 @@ class SaleOrder(models.Model):
             rec.user_related = False
             if rec.location_id:
                 if rec.location_id.partner_id:
-                    user_related = self.env['res.users'].sudo().search([('partner_id', '=', rec.location_id.partner_id.id)], limit=1)
+                    user_related = self.env['res.users'].sudo().search(
+                        [('partner_id', '=', rec.location_id.partner_id.id)], limit=1)
                     if user_related:
                         rec.user_related = user_related
 
@@ -91,70 +93,14 @@ class SaleOrder(models.Model):
 
             so.date_confirm_order = date.today()
 
-            products = self.env['product.product'].search([])
-            self.env['product.product'].browse(products.ids)._compute_quantities_dict(
-                so._context.get('lot_id'),
-                so._context.get(
-                    'owner_id'),
-                so._context.get(
-                    'package_id'),
-                so._context.get(
-                    'from_date'),
-                to_date=datetime.today())
 
-            multiple_stock_sku = {}
-            for e in so.order_line:
-                if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                    if e.product_id.product_tmpl_id.id in multiple_stock_sku:
-                        pass
-                    else:
-                        multiple_stock_sku[e.product_id.product_tmpl_id.id] = e.product_id.product_tmpl_id
-                else:
-                    magento_backend = so.env['magento.backend'].search([])
-                    stock_quant = so.env['stock.quant'].search(
-                        [('product_id', '=', e.product_id.id), ('location_id', '=', so.location_id.id)])
-                    if e.product_id.is_magento_product and so.location_id.is_from_magento:
-                        try:
-                            params = {
-                                "sourceItems": [
-                                    {
-                                        "sku": e.product_id.default_code,
-                                        "source_code": so.location_id.magento_source_code,
-                                        "quantity": stock_quant.quantity,
-                                        "status": 1
-                                    }
-                                ]
-                            }
-                            client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                            client.post('rest/V1/inventory/source-items', arguments=params)
-                        except Exception as a:
-                            raise UserError(('Can not update quantity product on source magento - %s') % tools.ustr(a))
-            if len(multiple_stock_sku) > 0:
-                for e in multiple_stock_sku:
-                    stock_quant = so.env['stock.quant'].search(
-                        [('product_id', '=', multiple_stock_sku[e].variant_manage_stock.id),
-                         ('location_id', '=', so.location_id.id)])
-                    magento_backend = so.env['magento.backend'].search([])
-                    for f in multiple_stock_sku[e].product_variant_ids:
-                        if f.is_magento_product and so.location_id.is_from_magento:
-                            try:
-                                params = {
-                                    "sourceItems": [
-                                        {
-                                            "sku": f.default_code,
-                                            "source_code": so.location_id.magento_source_code,
-                                            "quantity": stock_quant.quantity * multiple_stock_sku[e].variant_manage_stock.deduct_amount_parent_product / f.deduct_amount_parent_product,
-                                            "status": 1
-                                        }
-                                    ]
-                                }
-                                client = Client(magento_backend.web_url, magento_backend.access_token, True)
-
-                                client.post('rest/V1/inventory/source-items', arguments=params)
-
-                            except Exception as a:
-                                raise UserError(
-                                    ('Can not update quantity product on source magento - %s') % tools.ustr(a))
+            ## after action_done(), sync stock to magento
+            stock2magento = self.env['stock.to.magento']
+            magento_backend = self.env['magento.backend'].search([], limit=1)
+            client = Client(magento_backend.web_url, magento_backend.access_token, True)
+            for line in so.line_ids:
+                stock2magento.sync_quantity_to_magento(location_id=so.location_id,
+                                                       product_id=line.product_id, client=client)
         return result
 
     def _amount_all(self):

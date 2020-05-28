@@ -4,3 +4,5 @@ from . import product_product
 from . import product_template
 from . import stock
 from . import stock_immediate_transfer
+from . import stock_picking
+from . import stock_2_magento

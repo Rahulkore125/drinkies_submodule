@@ -607,6 +607,7 @@ class Order(Client):
                         tuple(magento_sale_orders_mapped_id))
 
                 for e in sale_order_created:
+                    #todo xử lý action confirm ở đây, chỉ done ship nếu status = shipping
                     e['information'].action_confirm()
                     context.env.cr.execute(
                         """UPDATE sale_order SET state = %s WHERE id = %s""", (str(e['status']), e['information'].id))

@@ -916,7 +916,7 @@ class MagentoBackend(models.Model):
             #         'backend_id': backend_id
             #     })
             #     orders_updated = order.list(currentPage=, pageSize=self.sale_orders_pageSize)
-
+            #todo chua co xu ly truong hop cancel khi da complete
             for e in orders_updated['items']:
                 exist_order = self.env['magento.sale.order'].search([('external_id', '=', e['entity_id'])])
                 if len(exist_order) == 0:
@@ -1031,7 +1031,7 @@ class MagentoBackend(models.Model):
                                         stock_quant = self.env['stock.quant'].search(
                                             [('product_id', '=', e.product_id.id),
                                              ('location_id', '=', picking.sale_id.location_id.id)])
-                                        if e.product_id.is_magento_product and self.location_id.is_from_magento:
+                                        if e.product_id.is_magento_product and picking.sale_id.location_id.is_from_magento:
                                             try:
                                                 params = {
                                                     "sourceItems": [

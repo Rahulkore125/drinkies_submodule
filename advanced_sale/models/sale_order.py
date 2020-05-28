@@ -93,7 +93,6 @@ class SaleOrder(models.Model):
 
             so.date_confirm_order = date.today()
 
-
             ## after action_done(), sync stock to magento
             stock2magento = self.env['stock.to.magento']
             magento_backend = self.env['magento.backend'].search([], limit=1)

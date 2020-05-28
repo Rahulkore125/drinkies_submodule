@@ -134,6 +134,10 @@
                     <!-- Add your fields or attributes here -->
                     <field name="partner_invoice_id" invisible="1"/>
                 </xpath>
+                <xpath expr="//button[@name='action_cancel']" position="before">
+                    <button name="action_confirm_complete" type="object" string="Complete"
+                            attrs="{'invisible':[('state','!=','sale')]}"/>
+                </xpath>
 
             </field>
         </record>

@@ -62,9 +62,48 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).create(vals_list)
         return res
 
+    # @api.multi
+    # def action_confirm(self):
+    #     result = super(SaleOrder, self).action_confirm()
+    #     for so in self:
+    #         for e in so.order_line:
+    #             if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+    #                 stock_quant = so.env['stock.quant'].search(
+    #                     [('location_id', '=', so.location_id.id),
+    #                      ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
+    #
+    #                 stock_quant.sudo().write({
+    #                     'updated_qty': True,
+    #                     'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
+    #                 })
+    #
+    #         stock_pickings = so.env['stock.picking'].search(
+    #             [('sale_id', '=', so.id), ('picking_type_id.code', '=', 'outgoing')])
+    #
+    #         for stock_picking in stock_pickings:
+    #             for move_line in stock_picking.move_lines:
+    #                 move_line.quantity_done = move_line.product_uom_qty
+    #
+    #             for move_line_id in stock_picking.move_line_ids:
+    #                 if so.location_id.id:
+    #                     move_line_id.location_id = so.location_id.id
+    #             stock_picking.location_id = so.location_id.id
+    #             stock_picking.action_done()
+    #             stock_picking.date_done_delivery = date.today()
+    #
+    #         so.date_confirm_order = date.today()
+    #
+    #         ## after action_done(), sync stock to magento
+    #         stock2magento = self.env['stock.to.magento']
+    #         magento_backend = self.env['magento.backend'].search([], limit=1)
+    #         client = Client(magento_backend.web_url, magento_backend.access_token, True)
+    #         for line in so.line_ids:
+    #             stock2magento.sync_quantity_to_magento(location_id=so.location_id,
+    #                                                    product_id=line.product_id, client=client)
+    #     return result
+
     @api.multi
-    def action_confirm(self):
-        result = super(SaleOrder, self).action_confirm()
+    def action_confirm_complete(self):
         for so in self:
             for e in so.order_line:
                 if e.product_id.product_tmpl_id.multiple_sku_one_stock:
@@ -92,15 +131,53 @@ class SaleOrder(models.Model):
                 stock_picking.date_done_delivery = date.today()
 
             so.date_confirm_order = date.today()
+            invoice_id = so.action_invoice_create(grouped=False, final=False)
 
+            for e in invoice_id:
+                invoice = self.env['account.invoice'].browse(e)
+                invoice.update({
+                    'original_invoice': True,
+                    'order_id': so.id
+                })
+                # print('ste_' + rec.magento_bind_ids.state)
+                invoice.action_invoice_open()
+                # if rec.is_magento_sale_order and rec.magento_bind_ids.state != 'complete':
+                #     print('not_done')
+                #     return result
+                # else:
+                if invoice.state != 'open':
+                    invoice.state = 'open'
+                if so.payment_method == 'cod':
+                    journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
+                elif so.payment_method == 'online_payment':
+                    journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
+                payment = self.env['account.payment'].create({
+                    'invoice_ids': [(4, e, None)],
+                    'amount': invoice.amount_total,
+                    'payment_date': date.today(),
+                    'communication': invoice.number,
+                    'payment_type': 'inbound',
+                    'journal_id': journal_id,
+                    'partner_type': 'customer',
+                    'payment_method_id': 1,
+                    'partner_id': invoice.partner_id.id
+                })
+                payment.action_validate_invoice_payment()
+            so.sudo().write({
+                'state': 'done'
+            })
+            magento_so = self.env['magento.sale.order'].sudo().search([('odoo_id', '=', so.id)])
+            magento_so.sudo().write({
+                'state': 'complete',
+                'status': 'complete',
+            })
             ## after action_done(), sync stock to magento
             stock2magento = self.env['stock.to.magento']
             magento_backend = self.env['magento.backend'].search([], limit=1)
             client = Client(magento_backend.web_url, magento_backend.access_token, True)
-            for line in so.line_ids:
+            for line in so.order_line:
                 stock2magento.sync_quantity_to_magento(location_id=so.location_id,
                                                        product_id=line.product_id, client=client)
-        return result
 
     def _amount_all(self):
         """

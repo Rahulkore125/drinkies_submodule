@@ -179,6 +179,7 @@ class SaleOrder(models.Model):
                 stock2magento.sync_quantity_to_magento(location_id=so.location_id,
                                                        product_id=line.product_id, client=client)
 
+    @api.depends('computed_discount_total')
     def _amount_all(self):
         """
         Compute the total amounts of the SO.
@@ -205,22 +206,21 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'), default=0.0,
-                            compute='_compute_discount_order_line')
+    discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'), default=0.0)
 
-    @api.multi
-    @api.depends('order_id.estimate_discount_total')
-    def _compute_discount_order_line(self):
-        for rec in self:
-            sum = 0
-            for e in rec.order_id.order_line:
-                if not e.is_reward_line and not e.is_delivery:
-                    sum += e.price_subtotal
-            if sum > 0:
-                each_line_order_discount = rec.order_id.computed_discount_total / sum * 100
-                for e in rec.order_id.order_line:
-                    if not e.is_reward_line and not e.is_delivery:
-                        e.discount = each_line_order_discount
+    # @api.multi
+    # @api.depends('order_id.estimate_discount_total')
+    # def _compute_discount_order_line(self):
+    #     for rec in self:
+    #         sum = 0
+    #         for e in rec.order_id.order_line:
+    #             if not e.is_reward_line and not e.is_delivery:
+    #                 sum += e.price_subtotal
+    #         if sum > 0:
+    #             each_line_order_discount = rec.order_id.computed_discount_total / sum * 100
+    #             for e in rec.order_id.order_line:
+    #                 if not e.is_reward_line and not e.is_delivery:
+    #                     e.discount = each_line_order_discount
 
     @api.onchange('product_id')
     def onchange_unit_price(self):

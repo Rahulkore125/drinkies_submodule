@@ -590,7 +590,7 @@ class Order(Client):
 
                     res.order_reference_id = res.name
                     res.team_id = drinkies_sale_team
-                    # res.action_confirm()
+                    res.action_confirm()
                     # context.env.cr.execute(
                     #     """UPDATE sale_order SET state = %s WHERE id = %s""", (str(e['status']), res.id))
                     sale_order_ids.append((res.id,))

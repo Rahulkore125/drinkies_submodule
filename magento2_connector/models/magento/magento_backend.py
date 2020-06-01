@@ -953,16 +953,24 @@ class MagentoBackend(models.Model):
                             })
                             self.env.cr.execute(
                                 """UPDATE sale_order SET state = %s WHERE id = %s""", ('done', exist_order.odoo_id.id))
-                    elif e['state'] == 'canceled' and exist_order.state in ['processing', 'shipping']:
+                    elif e['state'] == 'canceled' and exist_order.state in ['processing', 'shipping'] and \
+                            exist_order.picking_ids[0].state != 'done':
                         # self.fetch_shipments()
                         # self.fetch_invoice()
                         if exist_order.odoo_id.state != 'done':
+                            # has_picking_state_done = False
+                            # if exist_order.picking_ids:
+                            #     for picking in exist_order.picking_ids:
+                            #         if picking.state == 'done':
+                            #             has_picking_state_done = True
+                            # if not has_picking_state_done:
                             exist_order.odoo_id.action_cancel()
                             exist_order.write({
                                 'state': 'canceled',
                                 'status': 'canceled',
                             })
-                    elif e['state'] == 'canceled' and exist_order.state in ['complete']:
+                    # elif e['state'] == 'canceled' and exist_order.state in ['complete']:
+                    elif e['state'] == 'canceled':
                         for stock_picking in exist_order.picking_ids:
                             if stock_picking.state != 'done':
                                 stock_picking.action_cancel()
@@ -1108,7 +1116,7 @@ class MagentoBackend(models.Model):
                             'description': 'Return product',
                             'date_invoice': date.today(),
                         })
-
+                        # refund.sudo().invoice_refund()
                         invoice = self.env['account.invoice'].search([('original_invoice', '=', True), (
                             'order_id', '=', exist_order.odoo_id.id)])
                         invoice_lines = invoice.invoice_line_ids
@@ -1129,32 +1137,32 @@ class MagentoBackend(models.Model):
                         #             'quantity': e.quantity
                         #         })
                         #         invoice_lines_update.append(invoice_lines_copy[e.product_id.id].id)
-
-                        refund.with_context({'active_ids': [invoice.id]}).compute_refund(mode='refund')
-                        credit_note = self.env['account.invoice'].search([('refund_invoice_id', '=', invoice.id)])
-                        for e in credit_note:
-                            if e.state != 'paid':
-                                # e.invoice_line_ids = invoice_lines
-                                e.write({
-                                    'invoice_line_ids': [(6, 0, invoice_lines_update)]
-                                })
-                                e.action_invoice_open()
-                                if exist_order.payment_method == 'cod':
-                                    journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
-                                elif exist_order.payment_method == 'online_payment':
-                                    journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
-                                payment = self.env['account.payment'].create({
-                                    'invoice_ids': [(4, e.id, None)],
-                                    'amount': e.amount_total,
-                                    'payment_date': date.today(),
-                                    'communication': e.number,
-                                    'payment_type': 'outbound',
-                                    'journal_id': journal_id,
-                                    'partner_type': 'customer',
-                                    'payment_method_id': 1,
-                                    'partner_id': e.partner_id.id
-                                })
-                                payment.action_validate_invoice_payment()
+                        if invoice:
+                            refund.with_context({'active_ids': [invoice.id]}).compute_refund(mode='refund')
+                            credit_note = self.env['account.invoice'].search([('refund_invoice_id', '=', invoice.id)])
+                            for e in credit_note:
+                                if e.state != 'paid':
+                                    # e.invoice_line_ids = invoice_lines
+                                    e.write({
+                                        'invoice_line_ids': [(6, 0, invoice_lines_update)]
+                                    })
+                                    e.action_invoice_open()
+                                    if exist_order.payment_method == 'cod':
+                                        journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
+                                    elif exist_order.payment_method == 'online_payment':
+                                        journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')]).id
+                                    payment = self.env['account.payment'].create({
+                                        'invoice_ids': [(4, e.id, None)],
+                                        'amount': e.amount_total,
+                                        'payment_date': date.today(),
+                                        'communication': e.number,
+                                        'payment_type': 'outbound',
+                                        'journal_id': journal_id,
+                                        'partner_type': 'customer',
+                                        'payment_method_id': 1,
+                                        'partner_id': e.partner_id.id
+                                    })
+                                    payment.action_validate_invoice_payment()
                         exist_order.write({
                             'state': 'canceled',
                             'status': 'canceled'

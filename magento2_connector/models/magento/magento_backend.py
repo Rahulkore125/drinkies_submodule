@@ -1194,45 +1194,45 @@ class MagentoBackend(models.Model):
             self = self.env['magento.backend'].search([], limit=1)
 
         # search and check if = false then run
-        # self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
-        # self.env.cr.commit()
+        self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
+        self.env.cr.commit()
         if not self.auto_fetching:
-            try:
-                print("start fetch at " + str(datetime.now()))
-                self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = TRUE WHERE id = %s""", (self.id,))
-                self.env.cr.commit()
-                # try:
-                #     print(1)
-                #     self.fetch_products()
-                # except Exception as e:
-                #     print('1' + str(e))
-                # try:
-                #     print(3)
-                #     self.fetch_customers()
-                # except Exception as e:
-                #     print('3' + str(e))
-                # try:
+            # try:
+            print("start fetch at " + str(datetime.now()))
+            self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = TRUE WHERE id = %s""", (self.id,))
+            self.env.cr.commit()
+            # try:
+            #     print(1)
+            #     self.fetch_products()
+            # except Exception as e:
+            #     print('1' + str(e))
+            # try:
+            #     print(3)
+            #     self.fetch_customers()
+            # except Exception as e:
+            #     print('3' + str(e))
+            # try:
 
-                # self.fetch_shipments()
-                # self.fetch_invoice()
-                # self.fetch_order_update()
-                # except Exception as e:
-                # print('4' + str(e))
-                heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
-                qty_previous_day = self.env['product.product'].browse(heineken_product.ids)._compute_quantities_dict(
-                    self._context.get('lot_id'),
-                    self._context.get(
-                        'owner_id'),
-                    self._context.get(
-                        'package_id'),
-                    self._context.get(
-                        'from_date'),
-                    to_date=fields.datetime.now())
-                print('sale_order')
-                self.fetch_sale_orders()
-                self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
-                self.env.cr.commit()
-                print("end fetch at " + str(datetime.now()))
-            except:
-                self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
-                self.env.cr.commit()
+            # self.fetch_shipments()
+            # self.fetch_invoice()
+            # self.fetch_order_update()
+            # except Exception as e:
+            # print('4' + str(e))
+            heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
+            qty_previous_day = self.env['product.product'].browse(heineken_product.ids)._compute_quantities_dict(
+                self._context.get('lot_id'),
+                self._context.get(
+                    'owner_id'),
+                self._context.get(
+                    'package_id'),
+                self._context.get(
+                    'from_date'),
+                to_date=fields.datetime.now())
+            print('sale_order')
+            self.fetch_sale_orders()
+            self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
+            self.env.cr.commit()
+            print("end fetch at " + str(datetime.now()))
+            # except:
+            #     self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
+            #     self.env.cr.commit()

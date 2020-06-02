@@ -24,7 +24,7 @@ class Invoice(Client):
     def list_gt_updated_at(self, updated_at):
         return self.call('rest/V1/invoices',
                          'searchCriteria[filter_groups][0][filters][0][field]=updated_at&searchCriteria[filter_groups][0][filters][0][value]=' + str(
-                             updated_at) + '&searchCriteria[filter_groups][0][filters][0][condition_type]=gt')
+                             updated_at) + '&searchCriteria[filter_groups][0][filters][0][condition_type]=gteq')
 
     def get_array_tax_percent(self, context=None):
         taxes = context.env['account.tax'].sudo().search([])

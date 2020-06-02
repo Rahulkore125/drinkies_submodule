@@ -18,7 +18,7 @@ class Product(Client):
         return self.call('rest/V1/products',
                          'searchCriteria[filter_groups][0][filters][0][field]=updated_at&'
                          'searchCriteria[filter_groups][0][filters][0][value]=' + str(updated_at) + '&'
-                                                                                                    'searchCriteria[filter_groups][0][filters][0][condition_type]=gt&'
+                                                                                                    'searchCriteria[filter_groups][0][filters][0][condition_type]=gteq&'
                                                                                                     'searchCriteria[filter_groups][1][filters][0][field]=type_id&'
                                                                                                     'searchCriteria[filter_groups][1][filters][0][value]=configurable&'
                                                                                                     'searchCriteria[filter_groups][1][filters][0][condition_type]=' + str(

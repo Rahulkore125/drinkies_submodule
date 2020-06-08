@@ -65,7 +65,7 @@ class SaleHnkReport(models.Model):
         end_order_date = datetime(year=today_date.year, month=today_date.month,
                                   day=today_date.day, hour=24 - time_offset, minute=00, second=00)
         sale_orders = self.env['sale.order'].search(
-            [('create_date', '>', start_order_date), ('create_date', '<', end_order_date)])
+            [('write_date', '>', start_order_date), ('write_date', '<', end_order_date), ('state', '=', 'done')])
 
         heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
         magento_demo_simple_product = self.env.ref('magento2_connector.magento_sample_product_consumable')
@@ -237,11 +237,11 @@ class SaleHnkReport(models.Model):
                     #         'amount_lalafood_ol': sale_order_line.price_subtotal if sale_order.team_id.id == food_panda and sale_order.payment_method == 'online_payment' else 0,
                     #     }
 
-        scrap = self.env['stock.scrap'].search([('date_scrap', '=', self.date_report)])
+        scrap = self.env['stock.scrap'].search([('date_scrap', '=', self.date_report), ('state', '=', 'done')])
         for e in scrap:
             product_ids[e.product_id.id]['damaged'] += e.scrap_qty
         return_picking = self.env['stock.picking'].search(
-            [('date_return', '=', self.date_report), ('is_return_picking', '=', True)])
+            [('date_return', '=', self.date_report), ('is_return_picking', '=', True), ('state', '=', 'done')])
         for e in return_picking:
             for f in e.move_ids_without_package:
                 if not f.scrapped:

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="traceback_view_tree" model="ir.ui.view">
+            <field name="name">traceback_view_tree</field>
+            <field name="model">trace.back.information</field>
+            <field name="arch" type="xml">
+                <tree string="traceback_tree">
+                    <field name="time_log"/>
+                    <field name="infor"/>
+                </tree>
+            </field>
+        </record>
+        <record id="traceback_view_form" model="ir.ui.view">
+            <field name="name">traceback_view_form</field>
+            <field name="model">trace.back.information</field>
+            <field name="arch" type="xml">
+                <form string="traceback_form">
+                    <sheet>
+                        <group>
+                            <field name="time_log"/>
+                            <field name="infor"/>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="traceback_action" model="ir.actions.act_window">
+            <field name="name">Trace Back</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">trace.back.information</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="traceback_menu" name="Trace Back" parent="magento2_connector.magento_config" action="traceback_action" sequence="2" groups="base.group_no_one"/>
+    </data>
+</odoo>

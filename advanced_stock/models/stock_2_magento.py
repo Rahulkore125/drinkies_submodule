@@ -44,6 +44,11 @@ class StockToMagento(models.TransientModel):
                         client.post('rest/V1/inventory/source-items', arguments=params)
 
                     except Exception as a:
+                        traceback.print_exc(None, sys.stderr)
+                        self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                                                       VALUES (%s, %s)""",
+                                            (datetime.now(), str(traceback.format_exc())))
+                        self.env.cr.commit()
                         raise UserError(
                             ('Can not update quantity product on source magento - %s') % tools.ustr(a))
         else:
@@ -64,5 +69,10 @@ class StockToMagento(models.TransientModel):
                         }
                         client.post('rest/V1/inventory/source-items', arguments=params)
                     except Exception as a:
+                        traceback.print_exc(None, sys.stderr)
+                        self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                                                       VALUES (%s, %s)""",
+                                            (datetime.now(), str(traceback.format_exc())))
+                        self.env.cr.commit()
                         raise UserError(
                             ('Can not update quantity product on source magento - %s') % tools.ustr(a))

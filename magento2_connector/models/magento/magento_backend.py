@@ -1,6 +1,7 @@
 import datetime
 from datetime import date, datetime
-
+import sys
+import traceback
 import math
 
 from odoo import models, fields, api
@@ -476,7 +477,6 @@ class MagentoBackend(models.Model):
                                 'backend_id': backend_id
                             })
                             products = pro.list_product(page_size, current_page, 'configurable', 'eq')
-
                         total_count = products['total_count']
                         # truong hop dac biet voi drinkies it san pham nen ko can chia thanh tung phan de fetch nua
                         pro.insert_configurable_product(products['items'], backend_id, url, token, self)
@@ -487,6 +487,11 @@ class MagentoBackend(models.Model):
                         #         products = pro.list_product(page_size, page + 1, 'configurable', 'eq')
                         #         pro.insert_configurable_product(products['items'], backend_id, url, token)
                     except Exception as e:
+                        traceback.print_exc(None, sys.stderr)
+                        self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                               VALUES (%s, %s)""",
+                                            (datetime.now(), str(traceback.format_exc())))
+                        self.env.cr.commit()
                         raise UserError(_('fetch product configurable %s or fetch product attribute') % tools.ustr(e))
 
                     # Normal Product
@@ -970,7 +975,7 @@ class MagentoBackend(models.Model):
                                 'status': 'canceled',
                             })
                     elif e['state'] == 'canceled' and exist_order.state in ['complete']:
-                    # elif e['state'] == 'canceled':
+                        # elif e['state'] == 'canceled':
                         for stock_picking in exist_order.picking_ids:
                             if stock_picking.state != 'done':
                                 stock_picking.action_cancel()
@@ -1199,8 +1204,8 @@ class MagentoBackend(models.Model):
         if not self.auto_fetching:
             # try:
             print("start fetch at " + str(datetime.now()))
-            self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = TRUE WHERE id = %s""", (self.id,))
-            self.env.cr.commit()
+            # self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = TRUE WHERE id = %s""", (self.id,))
+            # self.env.cr.commit()
             # try:
             #     print(1)
             #     self.fetch_products()
@@ -1230,8 +1235,8 @@ class MagentoBackend(models.Model):
                 to_date=fields.datetime.now())
             print('sale_order')
             self.fetch_sale_orders()
-            self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
-            self.env.cr.commit()
+            # self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))
+            # self.env.cr.commit()
             print("end fetch at " + str(datetime.now()))
             # except:
             #     self.env.cr.execute("""UPDATE magento_backend SET auto_fetching = FALSE WHERE id = %s""", (self.id,))

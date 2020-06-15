@@ -42,6 +42,7 @@
         'views/dashboard/store.xml',
         'views/dashboard/storeview.xml',
         'views/dashboard/dashboard_view.xml',
+        'views/dashboard/traceback.xml',
 
         # data
         'data/product_scheduler.xml',

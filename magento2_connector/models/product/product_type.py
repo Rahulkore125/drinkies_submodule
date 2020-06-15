@@ -4,7 +4,9 @@ from urllib.request import Request, urlopen
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from ...utils.magento.product import Client
-
+import sys
+import traceback
+from datetime import datetime
 
 class ProductType(models.Model):
     _inherit = "product.template"
@@ -56,6 +58,11 @@ class ProductType(models.Model):
                                     }
                                     rec.image_small = profile_image
                             except:
+                                traceback.print_exc(None, sys.stderr)
+                                self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                                                               VALUES (%s, %s)""",
+                                                    (datetime.now(), str(traceback.format_exc())))
+                                self.env.cr.commit()
                                 raise UserError(_('Please provide correct URL or check your image size.!'))
                 else:
                     backend_id = self.env['magento.backend'].sudo().search([], limit=1)
@@ -77,4 +84,9 @@ class ProductType(models.Model):
                                     }
                                     rec.image_small = profile_image
                             except:
+                                traceback.print_exc(None, sys.stderr)
+                                self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                                                               VALUES (%s, %s)""",
+                                                    (datetime.now(), str(traceback.format_exc())))
+                                self.env.cr.commit()
                                 raise UserError(_('Please provide correct URL or check your image size.!'))

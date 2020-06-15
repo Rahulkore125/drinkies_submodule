@@ -6,3 +6,4 @@ from . import magento_pull_history
 from . import magento_store
 from . import magento_storeview
 from . import magento_website
+from . import trace_back

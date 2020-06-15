@@ -1,6 +1,8 @@
 from odoo import fields, models, api
 from odoo.tools import float_compare, UserError
-
+import sys
+import traceback
+from datetime import datetime
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -108,6 +110,11 @@ class SaleOrderLine(models.Model):
                                                   line.order_id.partner_shipping_id.property_stock_customer, line.name,
                                                   line.order_id.name, values)
             except UserError as error:
+                traceback.print_exc(None, sys.stderr)
+                self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                                               VALUES (%s, %s)""",
+                                    (datetime.now(), str(traceback.format_exc())))
+                self.env.cr.commit()
                 errors.append(error.name)
         if errors:
             raise UserError('\n'.join(errors))

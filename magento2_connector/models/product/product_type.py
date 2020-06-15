@@ -42,7 +42,7 @@ class ProductType(models.Model):
                     access_token = backend_id.access_token
                     sku = rec.default_code
                     client = Client(url, access_token)
-                    if str(sku) != '':
+                    if sku and str(sku) != '':
                         gallery = client.call('rest/V1/products/' + str(sku) + '/media', '')
                         if len(gallery) > 0:
                             file = gallery[0]['file']
@@ -63,7 +63,7 @@ class ProductType(models.Model):
                     access_token = backend_id.access_token
                     sku = rec.default_code
                     client = Client(url, access_token)
-                    if str(sku) != '':
+                    if sku and str(sku) != '':
                         gallery = client.call('rest/V1/products/' + str(sku) + '/media', '')
                         if len(gallery) > 0:
                             file = gallery[0]['file']

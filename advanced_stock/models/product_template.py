@@ -14,6 +14,18 @@ class ProductTemplate(models.Model):
     origin_quantity = fields.Float(string="Origin Quantity", default=0)
     fetching = fields.Boolean("Fetching", default=False)
 
+    def write(self, vals):
+        for rec in self:
+            if 'uom_id' in vals:
+                self.env.cr.execute(
+                    """UPDATE product_template SET uom_id = %s WHERE id = %s""", (vals['uom_id'], rec.id))
+                vals.pop('uom_id', None)
+            if 'uom_po_id' in vals:
+                self.env.cr.execute(
+                    """UPDATE product_template SET uom_po_id = %s WHERE id = %s""", (vals['uom_po_id'], rec.id))
+                vals.pop('uom_po_id', None)
+        return super(ProductTemplate, self).write(vals)
+
     @api.depends('variant_manage_stock')
     def _compute_product_variant_id(self):
         for p in self:
@@ -55,16 +67,16 @@ class ProductTemplate(models.Model):
                 }
             else:
                 for p in template.product_variant_ids:
-                        qty_available += variants_available[p.id]["qty_available"]
-                        virtual_available += variants_available[p.id]["virtual_available"]
-                        incoming_qty += variants_available[p.id]["incoming_qty"]
-                        outgoing_qty += variants_available[p.id]["outgoing_qty"]
+                    qty_available += variants_available[p.id]["qty_available"]
+                    virtual_available += variants_available[p.id]["virtual_available"]
+                    incoming_qty += variants_available[p.id]["incoming_qty"]
+                    outgoing_qty += variants_available[p.id]["outgoing_qty"]
                 prod_available[template.id] = {
-                            "qty_available": qty_available,
-                            "virtual_available": virtual_available,
-                            "incoming_qty": incoming_qty,
-                            "outgoing_qty": outgoing_qty,
-                        }
+                    "qty_available": qty_available,
+                    "virtual_available": virtual_available,
+                    "incoming_qty": incoming_qty,
+                    "outgoing_qty": outgoing_qty,
+                }
 
             template.origin_qty = qty_available
         return prod_available

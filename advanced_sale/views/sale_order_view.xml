@@ -134,6 +134,10 @@
                     <!-- Add your fields or attributes here -->
                     <field name="partner_invoice_id" invisible="1"/>
                 </xpath>
+                <xpath expr="//field[@name='confirmation_date']" position="before">
+                    <!-- Add your fields or attributes here -->
+                    <field name="delivery_date"/>
+                </xpath>
                 <xpath expr="//button[@name='action_cancel']" position="before">
                     <button name="action_cancel" states="draft,sent,sale" type="object" string="Cancel"/>
                     <button name="action_confirm_complete" type="object" string="Complete"
@@ -154,10 +158,13 @@
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a new quotation, the first step of a new sale!
-                </p><p>
-                Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice
-                and collect the payment.
-            </p>
+                </p>
+                <p>
+                    Once the quotation is confirmed, it becomes a sales order.
+                    <br/>
+                    You will be able to create an invoice
+                    and collect the payment.
+                </p>
             </field>
         </record>
     </data>

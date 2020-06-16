@@ -30,6 +30,7 @@ class SaleOrder(models.Model):
     # owner location can see own SO, invoice
     user_related = fields.Many2one(string="Owner location", comodel_name="res.users", compute="compute_user_related",
                                    store=True)
+    delivery_date = fields.Datetime(string='Delivery date')
 
     @api.depends('location_id')
     def compute_user_related(self):
@@ -164,7 +165,8 @@ class SaleOrder(models.Model):
                 })
                 payment.action_validate_invoice_payment()
             so.sudo().write({
-                'state': 'done'
+                'state': 'done',
+                'delivery_date': datetime.now()
             })
             magento_so = self.env['magento.sale.order'].sudo().search([('odoo_id', '=', so.id)])
             magento_so.sudo().write({

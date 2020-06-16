@@ -184,7 +184,7 @@ class Order(Client):
                             customers.append(billing_address_data)
 
                     # address shipping
-                    partner_shipping_id = 0
+                    partner_shipping_id = False
                     if 'address' in order['extension_attributes']['shipping_assignments'][0]['shipping']:
                         if 'customer_address_id' in \
                                 order['extension_attributes']['shipping_assignments'][0]['shipping']['address']:
@@ -221,14 +221,16 @@ class Order(Client):
                                 True,
                                 'delivery')
                             customers.append(shipping_address_data)
-                    context.env.cr.execute(
-                        """INSERT INTO res_partner (name, street,zip,city,state_id,country_id, email,phone, active,type) VALUES {values} RETURNING id""".format(
-                            values=", ".join(["%s"] * len(customers))), tuple(customers))
+                    magento_partner = context.env['magento.res.partner'].sudo().search([('external_id', '=', customer_id)])
+                    if not magento_partner:
+                        context.env.cr.execute(
+                            """INSERT INTO res_partner (name, street,zip,city,state_id,country_id, email,phone, active,type) VALUES {values} RETURNING id""".format(
+                                values=", ".join(["%s"] * len(customers))), tuple(customers))
 
-                    address_ids = context.env.cr.fetchall()
-                    partner_invoice_id = address_ids[0][0]
-                    if len(address_ids) > 1:
-                        partner_shipping_id = address_ids[1][0]
+                        address_ids = context.env.cr.fetchall()
+                        partner_invoice_id = address_ids[0][0]
+                        if len(address_ids) > 1:
+                            partner_shipping_id = address_ids[1][0]
 
                 name = prefix_order + order['increment_id']
                 # product_id = order['items'][0]['item_id']
@@ -440,8 +442,8 @@ class Order(Client):
                     sale_orders.append({'information':
                                             {'name': name,
                                              'partner_id': partner_id,
-                                             'partner_invoice_id': partner_invoice_id,
-                                             'partner_shipping_id': partner_shipping_id,
+                                             'partner_invoice_id': partner_id,
+                                             'partner_shipping_id': partner_id,
                                              'pricelist_id': product_price_list_id,
                                              # 'state': status,
                                              'confirmation_date': order['created_at'],

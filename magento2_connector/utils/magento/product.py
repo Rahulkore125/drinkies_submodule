@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # -*- coding: UTF-8 -*-
+from bs4 import BeautifulSoup
 
 from odoo.exceptions import UserError
 from odoo.http import request

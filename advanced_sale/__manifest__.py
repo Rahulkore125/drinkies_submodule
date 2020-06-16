@@ -31,6 +31,7 @@
         'views/sale_hnk_report_view.xml',
         'views/sale_and_stock_report.xml',
         'views/stock_view.xml',
+        'views/product_template.xml',
         'wizard/sale_and_stock_popup_view.xml'
     ],
 }

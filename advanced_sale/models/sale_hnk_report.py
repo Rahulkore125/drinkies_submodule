@@ -72,7 +72,7 @@ class SaleHnkReport(models.Model):
         magento_demo_service_product = self.env.ref('magento2_connector.magento_sample_product_service')
         heineken_product += magento_demo_service_product
         heineken_product += magento_demo_simple_product
-
+        heineken_product_discount = self.env['product.product'].sudo().search([('is_discount_product', '=', True)])
         qty_previous_day = self.with_context(location=self.location_id.id).env['product.product'].browse(
             heineken_product.ids)._compute_quantities_dict(
             self._context.get('lot_id'),
@@ -141,12 +141,44 @@ class SaleHnkReport(models.Model):
                     'returned': 0,
                     'amount_discount': 0
                 }
-
+        for product in heineken_product_discount:
+            product_ids[product.id] = {
+                'product_id': product.id,
+                'product_category_id': product.categ_id.id,
+                'sum_sale_chanel': 0,
+                'sum_fp_chanel': 0,
+                'sum_grab_chanel': 0,
+                'sum_shopee_chanel': 0,
+                'sum_lazmall_chanel': 0,
+                'sum_pos_chanel': 0,
+                'sum_lalafood_chanel': 0,
+                'amount_sale_cod': 0,
+                'amount_sale_ol': 0,
+                'amount_fp_cod': 0,
+                'amount_fp_ol': 0,
+                'amount_shopee_cod': 0,
+                'amount_shopee_ol': 0,
+                'amount_pos_cod': 0,
+                'amount_pos_ol': 0,
+                'amount_lazmall_cod': 0,
+                'amount_lazmall_ol': 0,
+                'amount_lalafood_cod': 0,
+                'amount_lalafood_ol': 0,
+                'amount_grab_cod': 0,
+                'amount_grab_ol': 0,
+                'open_stock': 0,
+                'close_stock': 0,
+                'open_stock_units': 0,
+                'close_stock_units': 0,
+                'damaged': 0,
+                'returned': 0,
+                'amount_discount': 0
+            }
         for sale_order in sale_orders:
             for sale_order_line in sale_order.order_line:
                 if not sale_order_line.is_reward_line and not sale_order_line.is_delivery:
                     # handle sale
-                    if sale_order_line.product_id.id in product_ids:
+                    if sale_order_line.product_id.id in product_ids or sale_order_line.product_id.is_discount_product:
                         # handle amount and quantity
                         if sale_order.team_id.id == sale:
                             product_ids[sale_order_line.product_id.id][
@@ -213,9 +245,12 @@ class SaleHnkReport(models.Model):
                                     'amount_lalafood_ol'] += sale_order_line.price_subtotal
                         # handle amount discount
                         # print(product_ids[sale_order_line.product_id.id])
-                        product_ids[sale_order_line.product_id.id][
-                            'amount_discount'] += sale_order_line.price_subtotal * sale_order_line.discount / 100
-
+                        if not sale_order_line.product_id.is_discount_product:
+                            product_ids[sale_order_line.product_id.id][
+                                'amount_discount'] += sale_order_line.price_subtotal * sale_order_line.discount / 100
+                        else:
+                            product_ids[sale_order_line.product_id.id][
+                                'amount_discount'] += abs(sale_order_line.price_subtotal)
                     # else:
                     #     product_ids[sale_order_line.product_id.id] = {
                     #         'product_id': sale_order_line.product_id.id,

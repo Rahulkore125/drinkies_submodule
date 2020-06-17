@@ -13,6 +13,8 @@
                             domain="[('is_magento_sale_order', '=', True)]"/>
                     <filter string="# Not From Magento" name="is_magento_sale_order"
                             domain="[('is_magento_sale_order', '=', False)]"/>
+                    <filter string="Location" name="location_id" domain="[]" context="{'group_by': 'location_id'}"/>
+                    <filter string="Owner Location" name="user_related" domain="[]" context="{'group_by': 'user_related'}"/>
                 </xpath>
             </field>
         </record>
@@ -27,6 +29,7 @@
                             domain="[('is_magento_sale_order', '=', True)]"/>
                     <filter string="# Not From Magento" name="is_magento_quotation"
                             domain="[('is_magento_sale_order', '=', False)]"/>
+                    <filter string="Delivery Date" name="filter_delivery_date" date="delivery_date"/>
                 </xpath>
             </field>
         </record>

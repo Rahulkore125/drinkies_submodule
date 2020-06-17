@@ -117,14 +117,15 @@ class Order(Client):
                             shipping_address_country_id, shipping_address['email'], shipping_address['telephone'], True,
                             'delivery')
                         customers.append(shipping_address_data)
+                        partner_duplicate = context.env['res.partner'].sudo().search([('email', '=', billing_address['email'])])
+                        if not partner_duplicate:
+                            context.env.cr.execute(
+                                """INSERT INTO res_partner (name, street,zip,city,state_id,country_id, email,phone, active,type) VALUES {values} RETURNING id""".format(
+                                    values=", ".join(["%s"] * len(customers))), tuple(customers))
 
-                        context.env.cr.execute(
-                            """INSERT INTO res_partner (name, street,zip,city,state_id,country_id, email,phone, active,type) VALUES {values} RETURNING id""".format(
-                                values=", ".join(["%s"] * len(customers))), tuple(customers))
-
-                        address_ids = context.env.cr.fetchall()
-                        partner_invoice_id = address_ids[0][0]
-                        partner_shipping_id = address_ids[1][0]
+                            address_ids = context.env.cr.fetchall()
+                            partner_invoice_id = address_ids[0][0]
+                            partner_shipping_id = address_ids[1][0]
                 else:
                     customers = []
                     # init guest partner
@@ -468,8 +469,7 @@ class Order(Client):
                             customer_address_id = shipping_address['customer_address_id']
                             current_customer_id = order['customer_id']
                             this_partner = context.env['res.partner'].search(
-                                [('magento_customer_id', '=', current_customer_id),
-                                 ('magento_address_id', '=', customer_address_id)])
+                                [('magento_customer_id', '=', current_customer_id)])
                             if not 'region' in shipping_address:
                                 shipping_address['region'] = 0
                             if not 'region_code' in shipping_address:
@@ -581,6 +581,7 @@ class Order(Client):
 
                 for e in sale_order_created:
                     # todo xử lý action confirm ở đây, chỉ done ship nếu status = shipping
+                    e['information'].partner_id.sudo()._compute_display_name()
                     e['information'].action_confirm()
                     if e['status'] == 'done':
                         e['information'].action_confirm_complete()

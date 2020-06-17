@@ -3,6 +3,8 @@ from ...magento2_connector.utils.magento.rest import Client
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 from odoo import tools, _
+import sys
+import traceback
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'

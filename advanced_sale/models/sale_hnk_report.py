@@ -246,13 +246,9 @@ class SaleHnkReport(models.Model):
                                     'amount_lalafood_ol'] += sale_order_line.price_subtotal
                         # handle amount discount
                         # print(product_ids[sale_order_line.product_id.id])
-                        if sale_order_line.product_id.id ==9285:
-                            a=1
                         if not sale_order_line.product_id.is_discount_product:
                             product_ids[sale_order_line.product_id.id][
                                 'amount_discount'] += sale_order_line.price_subtotal * sale_order_line.discount / 100
-                            product_ids[sale_order_line.product_id.id][
-                                'amount_discount'] += sale_order_line.direct_discount_amount
                         else:
                             product_ids[sale_order_line.product_id.id][
                                 'amount_discount'] += abs(sale_order_line.price_subtotal)

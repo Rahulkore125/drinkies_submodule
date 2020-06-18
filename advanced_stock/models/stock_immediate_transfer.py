@@ -39,12 +39,22 @@ class StockImmediateTransferInherit(models.TransientModel):
                 for move in pick.move_lines:
                     if pick.picking_type_id.code in ['outgoing', 'internal']:
                         for move_line in move.move_line_ids:
-                            stock2magento.sync_quantity_to_magento(location_id=pick.location_id,
-                                                                   product_id=move_line.product_id, client=client)
+                            if move_line.product_id.product_tmpl_id.multiple_sku_one_stock:
+                                stock2magento.force_update_inventory_special_keg(location_id=pick.location_id,
+                                                                       product_id=move_line.product_id, client=client)
+                            else:
+                                stock2magento.sync_quantity_to_magento(location_id=pick.location_id,
+                                                                       product_id=move_line.product_id, client=client)
+
                     if pick.picking_type_id.code in ['incoming', 'internal']:
                         for move_line in move.move_line_ids:
-                            stock2magento.sync_quantity_to_magento(location_id=pick.location_dest_id,
-                                                                   product_id=move_line.product_id, client=client)
+                            if move_line.product_id.product_tmpl_id.multiple_sku_one_stock:
+                                stock2magento.force_update_inventory_special_keg(location_id=pick.location_dest_id,
+                                                                       product_id=move_line.product_id, client=client)
+                            else:
+                                stock2magento.sync_quantity_to_magento(location_id=pick.location_dest_id,
+                                                                       product_id=move_line.product_id, client=client)
+
         if pick_to_backorder:
             return pick_to_backorder.action_generate_backorder_wizard()
         return False

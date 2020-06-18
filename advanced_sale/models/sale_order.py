@@ -63,59 +63,19 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).create(vals_list)
         return res
 
-    # @api.multi
-    # def action_confirm(self):
-    #     result = super(SaleOrder, self).action_confirm()
-    #     for so in self:
-    #         for e in so.order_line:
-    #             if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-    #                 stock_quant = so.env['stock.quant'].search(
-    #                     [('location_id', '=', so.location_id.id),
-    #                      ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-    #
-    #                 stock_quant.sudo().write({
-    #                     'updated_qty': True,
-    #                     'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
-    #                 })
-    #
-    #         stock_pickings = so.env['stock.picking'].search(
-    #             [('sale_id', '=', so.id), ('picking_type_id.code', '=', 'outgoing')])
-    #
-    #         for stock_picking in stock_pickings:
-    #             for move_line in stock_picking.move_lines:
-    #                 move_line.quantity_done = move_line.product_uom_qty
-    #
-    #             for move_line_id in stock_picking.move_line_ids:
-    #                 if so.location_id.id:
-    #                     move_line_id.location_id = so.location_id.id
-    #             stock_picking.location_id = so.location_id.id
-    #             stock_picking.action_done()
-    #             stock_picking.date_done_delivery = date.today()
-    #
-    #         so.date_confirm_order = date.today()
-    #
-    #         ## after action_done(), sync stock to magento
-    #         stock2magento = self.env['stock.to.magento']
-    #         magento_backend = self.env['magento.backend'].search([], limit=1)
-    #         client = Client(magento_backend.web_url, magento_backend.access_token, True)
-    #         for line in so.line_ids:
-    #             stock2magento.sync_quantity_to_magento(location_id=so.location_id,
-    #                                                    product_id=line.product_id, client=client)
-    #     return result
-
     @api.multi
     def action_confirm_complete(self):
         for so in self:
-            for e in so.order_line:
-                if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                    stock_quant = so.env['stock.quant'].search(
-                        [('location_id', '=', so.location_id.id),
-                         ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-
-                    stock_quant.sudo().write({
-                        'updated_qty': True,
-                        'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
-                    })
+            # for e in so.order_line:
+                # if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                #     stock_quant = so.env['stock.quant'].search(
+                #         [('location_id', '=', so.location_id.id),
+                #          ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
+                #
+                #     stock_quant.sudo().write({
+                #         'updated_qty': True,
+                #         'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
+                #     })
 
             stock_pickings = so.env['stock.picking'].search(
                 [('sale_id', '=', so.id), ('picking_type_id.code', '=', 'outgoing')])
@@ -148,6 +108,7 @@ class SaleOrder(models.Model):
                 # else:
                 if invoice.state != 'open':
                     invoice.state = 'open'
+                journal_id = 'cod'
                 if so.payment_method == 'cod':
                     journal_id = self.env['account.journal'].search([('code', '=', 'CSH1')]).id
                 elif so.payment_method == 'online_payment':
@@ -173,13 +134,17 @@ class SaleOrder(models.Model):
                 'state': 'complete',
                 'status': 'complete',
             })
-            ## after action_done(), sync stock to magento
-            stock2magento = self.env['stock.to.magento']
-            magento_backend = self.env['magento.backend'].search([], limit=1)
-            client = Client(magento_backend.web_url, magento_backend.access_token, True)
             for line in so.order_line:
-                stock2magento.sync_quantity_to_magento(location_id=so.location_id,
-                                                       product_id=line.product_id, client=client)
+                ## after action_done(), sync stock to magento
+                stock2magento = self.env['stock.to.magento']
+                magento_backend = self.env['magento.backend'].search([], limit=1)
+                client = Client(magento_backend.web_url, magento_backend.access_token, True)
+                if line.product_id.product_tmpl_id.multiple_sku_one_stock:
+                    stock2magento.force_update_inventory_special_keg(location_id=self.location_id,
+                                                                     product_id=line.product_id, client=client)
+                else:
+                    stock2magento.sync_quantity_to_magento(location_id=self.location_id,
+                                                           product_id=line.product_id, client=client)
 
     @api.depends('computed_discount_total')
     def _amount_all(self):

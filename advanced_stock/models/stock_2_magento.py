@@ -9,35 +9,6 @@ class StockToMagento(models.TransientModel):
     _name = "stock.to.magento"
 
     def sync_quantity_to_magento(self, location_id, product_id, client):
-        # if product_id.product_tmpl_id.multiple_sku_one_stock:
-        #     stock_quant_current_product = self.env['stock.quant'].search(
-        #         [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
-        #     # compute quant of varianmanager after update
-        #     amount_after_after = stock_quant_current_product.quantity * (product_id.deduct_amount_parent_product / product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product)
-        #     for product_variant in product_id.product_tmpl_id.product_variant_ids:
-        #         if product_variant.is_magento_product and location_id.is_from_magento:
-        #             try:
-        #                 params = {
-        #                     "sourceItems": [
-        #                         {
-        #                             "sku": product_variant.default_code,
-        #                             "source_code": location_id.magento_source_code,
-        #                             "quantity": amount_after_after * (product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product / product_variant.deduct_amount_parent_product),
-        #                             "status": 1
-        #                         }
-        #                     ]
-        #                 }
-        #                 client.post('rest/V1/inventory/source-items', arguments=params)
-        #
-        #             except Exception as a:
-        #                 traceback.print_exc(None, sys.stderr)
-        #                 self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
-        #                                                                                VALUES (%s, %s)""",
-        #                                     (datetime.now(), str(traceback.format_exc())))
-        #                 self.env.cr.commit()
-        #                 raise UserError(
-        #                     ('Can not update quantity product on source magento - %s') % tools.ustr(a))
-        # else:
         if product_id.is_magento_product and location_id.is_from_magento:
             new_quanty_stock = self.env['stock.quant'].sudo().search(
                 [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
@@ -90,4 +61,5 @@ class StockToMagento(models.TransientModel):
             'state': 'draft',
             'line_ids': [(6, 0, list_inventory_line)]
         })
+        self.sync_quantity_to_magento(location_id=location_id, product_id=product_id, client=client)
         stock_inventory.sudo()._action_done(force_done_variant=True)

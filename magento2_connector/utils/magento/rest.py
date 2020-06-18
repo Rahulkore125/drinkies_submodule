@@ -11,7 +11,7 @@ class Client(object):
     def __init__(self, url, token, verify_ssl=True):
         self._url = url
         self._token = token
-        self._verify_ssl = False
+        self._verify_ssl = verify_ssl
 
     def call(self, resource_path, arguments):
         url = '%s/%s' % (self._url, resource_path)

@@ -431,8 +431,6 @@ class Order(Client):
                              ('type', '=', False)])
                         if len(old_partner) > 0:
                             partner_id = old_partner.ids[0]
-                        else:
-                            partner_id = partner_invoice_id
 
                     # add source on sale order
                     if 'order_source_code' in order['extension_attributes']:

@@ -9,36 +9,12 @@ class StockToMagento(models.TransientModel):
     _name = "stock.to.magento"
 
     def sync_quantity_to_magento(self, location_id, product_id, client):
-        # pass
         # if product_id.product_tmpl_id.multiple_sku_one_stock:
-        #     # step1: update variant_manage_stock product quantity
         #     stock_quant_current_product = self.env['stock.quant'].search(
         #         [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
-        #     stock_of_variant_manage_stock = self.env['stock.quant'].search(
-        #         [('location_id', '=', location_id.id),
-        #          ('product_id', '=', product_id.product_tmpl_id.variant_manage_stock.id)])
-        #     stock_of_variant_manage_stock.sudo().write({
-        #         'updated_qty': True,
-        #         'quantity': stock_quant_current_product.quantity * product_id.deduct_amount_parent_product
-        #     })
+        #     # compute quant of varianmanager after update
+        #     amount_after_after = stock_quant_current_product.quantity * (product_id.deduct_amount_parent_product / product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product)
         #     for product_variant in product_id.product_tmpl_id.product_variant_ids:
-        #         ## step2 update quantity before update to magento
-        #         old_stock_quant = self.env['stock.quant'].search(
-        #             [('location_id', '=', location_id.id), ('product_id', '=', product_variant.id)])
-        #         if old_stock_quant:
-        #             old_stock_quant.sudo().write({
-        #                 'updated_qty': True,
-        #                 'quantity': stock_of_variant_manage_stock.quantity * (
-        #                         product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product / product_variant.deduct_amount_parent_product)
-        #             })
-        #         else:
-        #             self.env['stock.quant'].sudo().create({
-        #                 'product_id': product_variant.id,
-        #                 'location_id': location_id.id,
-        #                 'updated_qty': True,
-        #                 'quantity': stock_of_variant_manage_stock.quantity * (
-        #                         product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product / product_variant.deduct_amount_parent_product)
-        #             })
         #         if product_variant.is_magento_product and location_id.is_from_magento:
         #             try:
         #                 params = {
@@ -46,7 +22,7 @@ class StockToMagento(models.TransientModel):
         #                         {
         #                             "sku": product_variant.default_code,
         #                             "source_code": location_id.magento_source_code,
-        #                             "quantity": old_stock_quant.quantity,
+        #                             "quantity": amount_after_after * (product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product / product_variant.deduct_amount_parent_product),
         #                             "status": 1
         #                         }
         #                     ]
@@ -98,7 +74,6 @@ class StockToMagento(models.TransientModel):
         for product_variant in product_id.product_tmpl_id.product_variant_ids:
             if product_variant.id != product_id.id:
                 dict_product_update[product_variant.id] = amount_after_after * (product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product / product_variant.deduct_amount_parent_product)
-        print(dict_product_update)
         list_inventory_line = []
         for key in dict_product_update:
             inventory_line = self.env['stock.inventory.line'].sudo().create({
@@ -110,7 +85,7 @@ class StockToMagento(models.TransientModel):
         stock_inventory = self.env['stock.inventory'].create({
             'name': 'Update other variant of ' + product_id.name,
             'location_id': location_id.id,
-            'date': date.today(),
+            'date': datetime.now(),
             'filter': 'partial',
             'state': 'draft',
             'line_ids': [(6, 0, list_inventory_line)]

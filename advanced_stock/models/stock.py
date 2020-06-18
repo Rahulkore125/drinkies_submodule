@@ -53,35 +53,54 @@ class Inventory(models.Model):
 
     update_to_magento = fields.Boolean(default=False)
 
-    def _action_done(self):
-        self.action_check()
-        self.write({'state': 'done'})
-        self.post_inventory()
+    def _action_done(self, force_done_variant=False):
+        if force_done_variant:
+            self.action_check()
+            self.write({'state': 'done'})
+            self.post_inventory()
+            ## after action_done(), sync stock to magento
+            stock2magento = self.env['stock.to.magento']
+            magento_backend = self.env['magento.backend'].search([], limit=1)
+            client = Client(magento_backend.web_url, magento_backend.access_token, True)
+            for line in self.line_ids:
+                stock2magento.sync_quantity_to_magento(location_id=self.location_id,
+                                                       product_id=line.product_id, client=client)
+            return True
+        else:
+            self.action_check()
+            self.write({'state': 'done'})
+            self.post_inventory()
+            ##check special product in stock_inventory
+            if self.line_ids:
+                for line in self.line_ids:
+                    ## after action_done(), sync stock to magento
+                    stock2magento = self.env['stock.to.magento']
+                    magento_backend = self.env['magento.backend'].search([], limit=1)
+                    client = Client(magento_backend.web_url, magento_backend.access_token, True)
+                    if line.product_id.product_tmpl_id.multiple_sku_one_stock:
+                        stock2magento.force_update_inventory_special_keg(location_id=self.location_id,
+                                                                         product_id=line.product_id, client=client)
+                    else:
+                        stock2magento.sync_quantity_to_magento(location_id=self.location_id,
+                                                               product_id=line.product_id, client=client)
+                        # for e in self.line_ids:
+            #     if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+            #         stock_quant = self.env['stock.quant'].search(
+            #             [('location_id', '=', self.location_id.id),
+            #              ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
+            #
+            #         if stock_quant.original_qty != e.product_qty * e.product_id.deduct_amount_parent_product:
+            #             stock_quant.sudo().write({
+            #                 'updated_qty': True,
+            #                 'original_qty': e.product_qty * e.product_id.deduct_amount_parent_product
+            #             })
 
-        # for e in self.line_ids:
-        #     if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-        #         stock_quant = self.env['stock.quant'].search(
-        #             [('location_id', '=', self.location_id.id),
-        #              ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-        #
-        #         if stock_quant.original_qty != e.product_qty * e.product_id.deduct_amount_parent_product:
-        #             stock_quant.sudo().write({
-        #                 'updated_qty': True,
-        #                 'original_qty': e.product_qty * e.product_id.deduct_amount_parent_product
-        #             })
+            return True
 
-        return True
-
-    def action_validate(self):
-        res = super(Inventory, self).action_validate()
-        ## after action_done(), sync stock to magento
-        stock2magento = self.env['stock.to.magento']
-        magento_backend = self.env['magento.backend'].search([], limit=1)
-        client = Client(magento_backend.web_url, magento_backend.access_token, True)
-        for line in self.line_ids:
-            stock2magento.sync_quantity_to_magento(location_id=self.location_id,
-                                                   product_id=line.product_id, client=client)
-        return res
+    # def action_validate(self):
+    #     res = super(Inventory, self).action_validate()
+    #
+    #     return res
 
     def action_check(self):
         """ Checks the inventory and computes the stock move to do """

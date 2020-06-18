@@ -335,6 +335,7 @@ class Order(Client):
                                             'qty_invoiced': product_item['parent_item']['qty_invoiced'],
                                             'price_unit': product_item['parent_item']['price'],
                                             'discount': 0,
+                                            # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
                                             'tax_id': [(6, 0, [])]}))
                             else:
                                 order_lines.append(
@@ -344,6 +345,7 @@ class Order(Client):
                                             'qty_invoiced': product_item['qty_invoiced'],
                                             'price_unit': product_item['price'],
                                             'discount': 0,
+                                            # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
                                             'tax_id': [(6, 0, [])]}))
 
                     if shipment_method == 'flatrate_flatrate':

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+<!--    &lt;!&ndash; Inherit Form View to Modify it &ndash;&gt;-->
+<!--    <record id="view_order_form_magento" model="ir.ui.view">-->
+<!--        <field name="name">view_order_form_magento_inherit</field>-->
+<!--        <field name="model">sale.order</field>-->
+<!--        <field name="inherit_id" ref="sale.view_order_form"/>-->
+<!--        <field name="arch" type="xml">-->
+
+<!--            <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position="after">-->
+<!--                <field name="direct_discount_amount" invisible="0"/>-->
+<!--            </xpath>-->
+
+<!--        </field>-->
+<!--    </record>-->
     <!-- Customer -->
     <record id="view_partner_tree" model="ir.ui.view">
         <field name="name">magento.res.partner.tree</field>

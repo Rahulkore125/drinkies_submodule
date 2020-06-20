@@ -67,8 +67,7 @@ class SaleHnkReport(models.Model):
         sale_orders = self.env['sale.order'].search(
             [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date), ('state', '=', 'done')])
 
-        # heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
-        heineken_product = self.env['product.product'].search([])
+        heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
         magento_demo_simple_product = self.env.ref('magento2_connector.magento_sample_product_consumable')
         magento_demo_service_product = self.env.ref('magento2_connector.magento_sample_product_service')
         heineken_product += magento_demo_service_product

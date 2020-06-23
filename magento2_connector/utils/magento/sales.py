@@ -417,8 +417,20 @@ class Order(Client):
                                     'product_uom_qty': 1,
                                     'product_uom': 1,
                                     'is_delivery': False}))
+                    if 'base_reward_currency_amount' in order['extension_attributes']:
+                        discount_amount = order['extension_attributes']['base_reward_currency_amount']
+                        amount = order['extension_attributes']['reward_points_balance']
+                        order_line_discount = context.env.ref('magento2_connector.discount_record')
+                        order_lines.append(
+                            (0, 0, {'name': "Apply " + str(amount) + " Reward Point",
+                                    'price_unit': discount_amount,
+                                    'price_subtotal': discount_amount,
+                                    'product_id': order_line_discount.id,
+                                    'product_uom_qty': 1,
+                                    'product_uom': 1,
+                                    'is_delivery': False}))
                     # insert in sale_order with shipment
-
+                    payment_method = 'cod'
                     if order['payment']['method'] == 'eghlpayment':
                         payment_method = 'online_payment'
                     elif order['payment']['method'] == 'cashondelivery':

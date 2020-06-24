@@ -67,15 +67,15 @@ class SaleOrder(models.Model):
     def action_confirm_complete(self):
         for so in self:
             # for e in so.order_line:
-                # if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-                #     stock_quant = so.env['stock.quant'].search(
-                #         [('location_id', '=', so.location_id.id),
-                #          ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-                #
-                #     stock_quant.sudo().write({
-                #         'updated_qty': True,
-                #         'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
-                #     })
+            # if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+            #     stock_quant = so.env['stock.quant'].search(
+            #         [('location_id', '=', so.location_id.id),
+            #          ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
+            #
+            #     stock_quant.sudo().write({
+            #         'updated_qty': True,
+            #         'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
+            #     })
 
             stock_pickings = so.env['stock.picking'].search(
                 [('sale_id', '=', so.id), ('picking_type_id.code', '=', 'outgoing')])
@@ -127,8 +127,11 @@ class SaleOrder(models.Model):
                 payment.action_validate_invoice_payment()
             so.sudo().write({
                 'state': 'done',
-                'delivery_date': datetime.now()
             })
+            if not so.sudo().delivery_date:
+                so.sudo().write({
+                    'delivery_date': datetime.now()
+                })
             magento_so = self.env['magento.sale.order'].sudo().search([('odoo_id', '=', so.id)])
             magento_so.sudo().write({
                 'state': 'complete',

@@ -13,18 +13,6 @@ class SaleAndStockPopup(models.TransientModel):
         (1, 'At a Time Period')
     ], string="Compute", default=0)
 
-    # def _get_from_datetime(self):
-    #     today_date = datetime.date.today()
-    #     today_from = datetime.datetime(int(today_date.year), int(today_date.month), int(today_date.day), 0, 0, 0)
-    #     print(str(today_from))
-    #     return today_from
-    #
-    # def _get_to_datetime(self):
-    #     today_date = datetime.date.today()
-    #     today_to = datetime.datetime(int(today_date.year), int(today_date.month), int(today_date.day), 23, 59, 59)
-    #     print(str(today_to))
-    #     return today_to
-
     date_report = fields.Date(string="Date Report", default=fields.Date.today)
     from_date_report = fields.Datetime(string="From Date", default=datetime.datetime.now())
     to_date_report = fields.Datetime(string="To Date", default=datetime.datetime.now())
@@ -36,13 +24,15 @@ class SaleAndStockPopup(models.TransientModel):
             date_from = datetime.datetime(int(date_report.year), int(date_report.month), int(date_report.day), 0, 0, 0)
             date_to = datetime.datetime(int(date_report.year), int(date_report.month), int(date_report.day), 23, 59, 59)
             sale_orders = self.env['sale.order'].sudo().search(
-                [('state', 'in', ['done', 'sale']), ('confirmation_date', '<=', date_to),
-                 ('confirmation_date', '>=', date_from)])
+                [('state', 'in', ['done']), ('delivery_date', '<=', date_to),
+                 ('delivery_date', '>=', date_from)])
+            self.env['sale.and.stock.report'].sudo().search([]).unlink()
             if sale_orders:
-                self.env['sale.and.stock.report'].sudo().search([]).unlink()
                 for order in sale_orders:
                     if order.order_line:
                         for line in order.order_line:
+                            if line.qty_invoiced == 0:
+                                print(line.order_id.name)
                             self.env['sale.and.stock.report'].create({
                                 'product_id': line.product_id.id,
                                 'location_id': line.order_id.location_id.id if line.order_id.location_id else False,
@@ -55,8 +45,8 @@ class SaleAndStockPopup(models.TransientModel):
             date_from = self.from_date_report
             date_to = self.to_date_report
             sale_orders = self.env['sale.order'].sudo().search(
-                [('state', 'in', ['done', 'sale']), ('confirmation_date', '<=', date_to),
-                 ('confirmation_date', '>=', date_from)])
+                [('state', 'in', ['done']), ('delivery_date', '<=', date_to),
+                 ('delivery_date', '>=', date_from)])
             if sale_orders:
                 self.env['sale.and.stock.report'].sudo().search([]).unlink()
                 for order in sale_orders:
@@ -82,15 +72,3 @@ class SaleAndStockPopup(models.TransientModel):
         }
         return action
 
-    # def generate_report_test(self):
-    #     date_from = self.from_date_report
-    #     date_to = self.to_date_report
-    #     res = self.product_test._compute_quantities_dict(
-    #         self._context.get('lot_id'),
-    #         self._context.get(
-    #             'owner_id'),
-    #         self._context.get(
-    #             'package_id'),
-    #         from_date=date_from,
-    #         to_date=date_to)
-    #     print(res)

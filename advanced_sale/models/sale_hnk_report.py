@@ -71,12 +71,13 @@ class SaleHnkReport(models.Model):
             sale_orders = self.env['sale.order'].search(
                 [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date), ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
 
+
         heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
         magento_demo_simple_product = self.env.ref('magento2_connector.magento_sample_product_consumable')
         magento_demo_service_product = self.env.ref('magento2_connector.magento_sample_product_service')
         heineken_product += magento_demo_service_product
         heineken_product += magento_demo_simple_product
-        heineken_product_discount = self.env['product.product'].sudo().search([('is_discount_product', '=', True)])
+
         qty_previous_day = self.with_context(location=self.location_id.id).env['product.product'].browse(
             heineken_product.ids)._compute_quantities_dict(
             self._context.get('lot_id'),
@@ -145,44 +146,18 @@ class SaleHnkReport(models.Model):
                     'returned': 0,
                     'amount_discount': 0
                 }
-        for product in heineken_product_discount:
-            product_ids[product.id] = {
-                'product_id': product.id,
-                'product_category_id': product.categ_id.id,
-                'sum_sale_chanel': 0,
-                'sum_fp_chanel': 0,
-                'sum_grab_chanel': 0,
-                'sum_shopee_chanel': 0,
-                'sum_lazmall_chanel': 0,
-                'sum_pos_chanel': 0,
-                'sum_lalafood_chanel': 0,
-                'amount_sale_cod': 0,
-                'amount_sale_ol': 0,
-                'amount_fp_cod': 0,
-                'amount_fp_ol': 0,
-                'amount_shopee_cod': 0,
-                'amount_shopee_ol': 0,
-                'amount_pos_cod': 0,
-                'amount_pos_ol': 0,
-                'amount_lazmall_cod': 0,
-                'amount_lazmall_ol': 0,
-                'amount_lalafood_cod': 0,
-                'amount_lalafood_ol': 0,
-                'amount_grab_cod': 0,
-                'amount_grab_ol': 0,
-                'open_stock': 0,
-                'close_stock': 0,
-                'open_stock_units': 0,
-                'close_stock_units': 0,
-                'damaged': 0,
-                'returned': 0,
-                'amount_discount': 0
-            }
+
         for sale_order in sale_orders:
+            #compute total discount
+            discount = 0
+            for sale_order_line in sale_order.order_line:
+                if sale_order_line.product_id.is_discount_product:
+                    discount = sale_order_line.price_subtotal
+
             for sale_order_line in sale_order.order_line:
                 if not sale_order_line.is_reward_line and not sale_order_line.is_delivery:
                     # handle sale
-                    if sale_order_line.product_id.id in product_ids or sale_order_line.product_id.is_discount_product:
+                    if not sale_order_line.product_id.is_discount_product:
                         # handle amount and quantity
                         if sale_order.team_id.id == sale:
                             product_ids[sale_order_line.product_id.id][
@@ -248,33 +223,10 @@ class SaleHnkReport(models.Model):
                                 product_ids[sale_order_line.product_id.id][
                                     'amount_lalafood_ol'] += sale_order_line.price_subtotal
                         # handle amount discount
-                        # print(product_ids[sale_order_line.product_id.id])
-                        if not sale_order_line.product_id.is_discount_product:
+                        if abs(discount) > 0:
                             product_ids[sale_order_line.product_id.id][
-                                'amount_discount'] += sale_order_line.price_subtotal * sale_order_line.discount / 100
-                        else:
-                            product_ids[sale_order_line.product_id.id][
-                                'amount_discount'] += abs(sale_order_line.price_subtotal)
-                    # else:
-                    #     product_ids[sale_order_line.product_id.id] = {
-                    #         'product_id': sale_order_line.product_id.id,
-                    #         'sum_sale_chanel': sale_order_line.product_uom_qty if sale_order.team_id.id == sale else 0,
-                    #         'sum_fp_chanel': sale_order_line.product_uom_qty if sale_order.team_id.id == food_panda else 0,
-                    #         'sum_grab_chanel': sale_order_line.product_uom_qty if sale_order.team_id.id == grab else 0,
-                    #         'amount_sale_cod': sale_order_line.price_subtotal if sale_order.team_id.id == sale and sale_order.payment_method == 'cod' else 0,
-                    #         'amount_sale_ol': sale_order_line.price_subtotal if sale_order.team_id.id == sale and sale_order.payment_method == 'online_payment' else 0,
-                    #         'amount_fp_cod': sale_order_line.price_subtotal if sale_order.team_id.id == food_panda and sale_order.payment_method == 'cod' else 0,
-                    #         'amount_fp_ol': sale_order_line.price_subtotal if sale_order.team_id.id == food_panda and sale_order.payment_method == 'online_payment' else 0,
-                    #         'amount_grab': sale_order_line.price_subtotal if sale_order.team_id.id == grab else 0,
-                    #         'amount_shopee_cod': sale_order_line.price_subtotal if sale_order.team_id.id == shopee and sale_order.payment_method == 'cod' else 0,
-                    #         'amount_shopee_ol': sale_order_line.price_subtotal if sale_order.team_id.id == shopee and sale_order.payment_method == 'online_payment' else 0,
-                    #         'amount_pos_cod': sale_order_line.price_subtotal if sale_order.team_id.id == pos and sale_order.payment_method == 'cod' else 0,
-                    #         'amount_pos_ol': sale_order_line.price_subtotal if sale_order.team_id.id == pos and sale_order.payment_method == 'online_payment' else 0,
-                    #         'amount_lazmall_cod': sale_order_line.price_subtotal if sale_order.team_id.id == lazmall and sale_order.payment_method == 'cod' else 0,
-                    #         'amount_lazmall_ol': sale_order_line.price_subtotal if sale_order.team_id.id == lazmall and sale_order.payment_method == 'online_payment' else 0,
-                    #         'amount_lalafood_cod': sale_order_line.price_subtotal if sale_order.team_id.id == food_panda and sale_order.payment_method == 'cod' else 0,
-                    #         'amount_lalafood_ol': sale_order_line.price_subtotal if sale_order.team_id.id == food_panda and sale_order.payment_method == 'online_payment' else 0,
-                    #     }
+                                'amount_discount'] += sale_order_line.price_subtotal * abs(discount) / sale_order.amount_untaxed
+
 
         scrap = self.env['stock.scrap'].search([('date_scrap', '=', self.date_report), ('state', '=', 'done')])
         for e in scrap:

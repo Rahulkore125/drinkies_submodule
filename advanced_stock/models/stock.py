@@ -114,6 +114,14 @@ class Inventory(models.Model):
 class InventoryLine(models.Model):
     _inherit = 'stock.inventory.line'
 
+    unit_theoretical_qty = fields.Float('Units Theoretical Quantity', compute='_compute_unit_theoretical_qty')
+    unit_real_qty = fields.Float('Units Real Quantity')
+
+    @api.multi
+    def _compute_unit_theoretical_qty(self):
+        for rec in self:
+            rec.unit_theoretical_qty = rec.theoretical_qty*rec.product_uom_id.factor_inv
+
     def _generate_moves(self):
         vals_list = []
         for line in self:

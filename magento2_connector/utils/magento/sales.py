@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-from datetime import date
-
 from .customer import get_state_id, get_country_id
 from ..magento.rest import Client
 
@@ -117,7 +115,8 @@ class Order(Client):
                             shipping_address_country_id, shipping_address['email'], shipping_address['telephone'], True,
                             'delivery')
                         customers.append(shipping_address_data)
-                        partner_duplicate = context.env['res.partner'].sudo().search([('email', '=', billing_address['email'])])
+                        partner_duplicate = context.env['res.partner'].sudo().search(
+                            [('email', '=', billing_address['email'])])
                         if not partner_duplicate:
                             context.env.cr.execute(
                                 """INSERT INTO res_partner (name, street,zip,city,state_id,country_id, email,phone, active,type) VALUES {values} RETURNING id""".format(
@@ -222,7 +221,8 @@ class Order(Client):
                                 True,
                                 'delivery')
                             customers.append(shipping_address_data)
-                    magento_partner = context.env['magento.res.partner'].sudo().search([('external_id', '=', customer_id)])
+                    magento_partner = context.env['magento.res.partner'].sudo().search(
+                        [('external_id', '=', customer_id)])
                     if not magento_partner:
                         context.env.cr.execute(
                             """INSERT INTO res_partner (name, street,zip,city,state_id,country_id, email,phone, active,type) VALUES {values} RETURNING id""".format(
@@ -452,6 +452,7 @@ class Order(Client):
                         source = False
                     default_location = context.env['stock.location'].sudo().search(
                         [('magento_source_code', '=', 'default')], limit=1)
+                    system_user = context.env['res.users'].sudo().search([('id', '=', 1)])
                     sale_orders.append({'information':
                                             {'name': name,
                                              'partner_id': partner_id,
@@ -467,7 +468,9 @@ class Order(Client):
                                              'currency_id': currency,
                                              'payment_method': payment_method,
                                              'location_id': source.id if source else (
-                                                 default_location.id if default_location else False)
+                                                 default_location.id if default_location else False),
+                                             'user_id': source.partner_id.user_ids[0].id if source.partner_id else (
+                                                 system_user.id if system_user else False)
                                              # 'note': ("Apply discount code:" + str(coupon_code)) if coupon_code != '' else None
                                              },
                                         'status': state

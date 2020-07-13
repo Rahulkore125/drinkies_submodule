@@ -21,9 +21,9 @@
                                 <field name="prod_lot_id" domain="[('product_id', '=', product_id)]" attrs="{'readonly': [('product_tracking', '=', 'none')]}" context="{'default_product_id': product_id}" groups="stock.group_production_lot"/>
                                 <field name="package_id" domain="['|', ('location_id','=', False), ('location_id', '=', location_id)]" groups="stock.group_tracking_lot"/>
                                 <field name="partner_id" groups="stock.group_tracking_owner"/>
-<!--                                <field name="unit_theoretical_qty" readonly="1"/>-->
+                                <field name="unit_theoretical_qty" readonly="1"/>
                                 <field name="theoretical_qty" readonly="1"/>
-<!--                                <field name="unit_real_qty" string="Unit Real Quantity"/>-->
+                                <field name="unit_real_qty" string="Unit Real Quantity"/>
                                 <field name="product_qty" string="Real Quantity"/>
                                 <field name="state" invisible="True"/>
                             </tree>
@@ -35,9 +35,9 @@
                                 <field name="prod_lot_id" domain="[('product_id', '=', product_id)]" attrs="{'readonly': [('product_tracking', '=', 'none')]}" context="{'default_product_id': product_id}" groups="stock.group_production_lot"/>
                                 <field name="package_id" domain="['|', ('location_id','=', False), ('location_id', '=', location_id)]"/>
                                 <field name="partner_id"/>
-<!--                                <field name="unit_theoretical_qty" readonly="1"/>-->
+                                <field name="unit_theoretical_qty" readonly="1"/>
                                 <field name="theoretical_qty" readonly="1"/>
-<!--                                <field name="unit_real_qty" string="Unit Real Quantity"/>-->
+                                <field name="unit_real_qty" string="Unit Real Quantity"/>
                                 <field name="product_qty" string="Real Quantity"/>
                                 <field name="state" invisible="True"/>
 

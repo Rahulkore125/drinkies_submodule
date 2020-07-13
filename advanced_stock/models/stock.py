@@ -3,7 +3,7 @@ from odoo.tools import float_utils, float_compare
 from ...magento2_connector.utils.magento.rest import Client
 from odoo import tools, _
 from odoo.exceptions import UserError
-
+from odoo.addons import decimal_precision as dp
 
 class ProductChangeQuantity(models.TransientModel):
     _inherit = "stock.change.product.qty"
@@ -114,18 +114,27 @@ class Inventory(models.Model):
 class InventoryLine(models.Model):
     _inherit = 'stock.inventory.line'
 
-    # unit_theoretical_qty = fields.Float('Units Theoretical Quantity', compute='_compute_unit_theoretical_qty')
-    # unit_real_qty = fields.Float('Units Real Quantity')
+    unit_theoretical_qty = fields.Float('Unit Theoretical Quantity', compute='_compute_unit_theoretical_qty')
+    unit_real_qty = fields.Float('Unit Real Quantity')
+    product_qty = fields.Float(
+        'Checked Quantity',
+        digits=dp.get_precision('Product Unit of Measure'), default=0, compute='_compute_real_quantity', store= True)
 
-    # @api.multi
-    # def _compute_unit_theoretical_qty(self):
-    #     for rec in self:
-    #         rec.unit_theoretical_qty = rec.theoretical_qty*rec.product_uom_id.factor_inv
+    @api.multi
+    def _compute_unit_theoretical_qty(self):
+        for rec in self:
+            rec.unit_theoretical_qty = rec.theoretical_qty*rec.product_uom_id.factor_inv
+
+    @api.multi
+    @api.depends('unit_real_qty')
+    def _compute_real_quantity(self):
+        for rec in self:
+            if rec.product_uom_id.factor_inv:
+                rec.product_qty = rec.unit_real_qty/rec.product_uom_id.factor_inv
 
     def _generate_moves(self):
         vals_list = []
         for line in self:
-
             if float_utils.float_compare(line.theoretical_qty, line.product_qty,
                                          precision_rounding=line.product_id.uom_id.rounding) == 0:
                 continue

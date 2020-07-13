@@ -9,30 +9,31 @@ class StockToMagento(models.TransientModel):
     _name = "stock.to.magento"
 
     def sync_quantity_to_magento(self, location_id, product_id, client):
-        if product_id.is_magento_product and location_id.is_from_magento:
-            new_quanty_stock = self.env['stock.quant'].sudo().search(
-                [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
-            if new_quanty_stock:
-                try:
-                    params = {
-                        "sourceItems": [
-                            {
-                                "sku": product_id.default_code,
-                                "source_code": location_id.magento_source_code,
-                                "quantity": new_quanty_stock.quantity,
-                                "status": 1
-                            }
-                        ]
-                    }
-                    client.post('rest/V1/inventory/source-items', arguments=params)
-                except Exception as a:
-                    traceback.print_exc(None, sys.stderr)
-                    self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
-                                                                                   VALUES (%s, %s)""",
-                                        (datetime.now(), str(traceback.format_exc())))
-                    self.env.cr.commit()
-                    raise UserError(
-                        ('Can not update quantity product on source magento - %s') % tools.ustr(a))
+        # if product_id.is_magento_product and location_id.is_from_magento:
+        #     new_quanty_stock = self.env['stock.quant'].sudo().search(
+        #         [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
+        #     if new_quanty_stock:
+        #         try:
+        #             params = {
+        #                 "sourceItems": [
+        #                     {
+        #                         "sku": product_id.default_code,
+        #                         "source_code": location_id.magento_source_code,
+        #                         "quantity": new_quanty_stock.quantity,
+        #                         "status": 1
+        #                     }
+        #                 ]
+        #             }
+        #             client.post('rest/V1/inventory/source-items', arguments=params)
+        #         except Exception as a:
+        #             traceback.print_exc(None, sys.stderr)
+        #             self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+        #                                                                            VALUES (%s, %s)""",
+        #                                 (datetime.now(), str(traceback.format_exc())))
+        #             self.env.cr.commit()
+        #             raise UserError(
+        #                 ('Can not update quantity product on source magento - %s') % tools.ustr(a))
+        pass
 
     def force_update_inventory_special_keg(self, location_id, product_id, client):
         # step1: compute all product variant quantity
@@ -61,5 +62,6 @@ class StockToMagento(models.TransientModel):
             'state': 'draft',
             'line_ids': [(6, 0, list_inventory_line)]
         })
+
         self.sync_quantity_to_magento(location_id=location_id, product_id=product_id, client=client)
         stock_inventory.sudo()._action_done(force_done_variant=True)

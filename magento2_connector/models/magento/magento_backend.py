@@ -477,8 +477,10 @@ class MagentoBackend(models.Model):
                                 'backend_id': backend_id
                             })
                             products = pro.list_product(page_size, current_page, 'configurable', 'eq')
+                        print(products)
                         total_count = products['total_count']
                         # truong hop dac biet voi drinkies it san pham nen ko can chia thanh tung phan de fetch nua
+                        print(products['items'])
                         pro.insert_configurable_product(products['items'], backend_id, url, token, self)
 
                         # total_page = get_current_page(total_count, page_size)
@@ -497,28 +499,34 @@ class MagentoBackend(models.Model):
                     # Normal Product
                     pull_history_normal_product = self.env['magento.pull.history'].search(
                         [('backend_id', '=', backend_id), ('name', '=', 'normal_product')])
-                    # try:
-                    if pull_history_normal_product:
-                        sync_date = pull_history_normal_product.sync_date
-                        products = pro.list_gt_updated_product(sync_date, 'neq')
-                        if len(products['items']) > 0:
-                            pull_history_normal_product.write({
-                                'sync_date': datetime.today()
+                    try:
+                        if pull_history_normal_product:
+                            sync_date = pull_history_normal_product.sync_date
+                            products = pro.list_gt_updated_product(sync_date, 'neq')
+                            if len(products['items']) > 0:
+                                pull_history_normal_product.write({
+                                    'sync_date': datetime.today()
+                                })
+                        else:
+                            # first pull
+                            self.env['magento.pull.history'].create({
+                                'name': 'normal_product',
+                                'sync_date': datetime.today(),
+                                'backend_id': backend_id
                             })
-                    else:
-                        # first pull
-                        self.env['magento.pull.history'].create({
-                            'name': 'normal_product',
-                            'sync_date': datetime.today(),
-                            'backend_id': backend_id
-                        })
-                        products = pro.list_product(page_size, current_page, 'configurable', 'neq')
+                            products = pro.list_product(page_size, current_page, 'configurable', 'neq')
 
-                    # todo
-                    # truong hop dac biet voi drinkies it san pham nen ko can chia thanh tung phan de fetch nua
+                        # todo
+                        # truong hop dac biet voi drinkies it san pham nen ko can chia thanh tung phan de fetch nua
 
-                    total_count = products['total_count']
-                    pro.insert_not_configurable_product(products['items'], backend_id, url, token, self)
+                        total_count = products['total_count']
+                        pro.insert_not_configurable_product(products['items'], backend_id, url, token, self)
+                    except Exception as e:
+                        traceback.print_exc(None, sys.stderr)
+                        self.env.cr.execute("""INSERT INTO trace_back_information (time_log, infor)
+                                                               VALUES (%s, %s)""",
+                                            (datetime.now(), str(traceback.format_exc())))
+                        self.env.cr.commit()
 
             return {
                 'type': 'ir.actions.act_window',

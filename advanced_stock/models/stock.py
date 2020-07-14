@@ -83,17 +83,17 @@ class Inventory(models.Model):
                     else:
                         stock2magento.sync_quantity_to_magento(location_id=self.location_id,
                                                                product_id=line.product_id, client=client)
-                        # for e in self.line_ids:
-            #     if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-            #         stock_quant = self.env['stock.quant'].search(
-            #             [('location_id', '=', self.location_id.id),
-            #              ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-            #
-            #         if stock_quant.original_qty != e.product_qty * e.product_id.deduct_amount_parent_product:
-            #             stock_quant.sudo().write({
-            #                 'updated_qty': True,
-            #                 'original_qty': e.product_qty * e.product_id.deduct_amount_parent_product
-            #             })
+                # for e in self.line_ids:
+                #     if e.product_id.product_tmpl_id.multiple_sku_one_stock:
+                #         stock_quant = self.env['stock.quant'].search(
+                #             [('location_id', '=', self.location_id.id),
+                #              ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
+                #
+                #         if stock_quant.original_qty != e.product_qty * e.product_id.deduct_amount_parent_product:
+                #             stock_quant.sudo().write({
+                #                 'updated_qty': True,
+                #                 'original_qty': e.product_qty * e.product_id.deduct_amount_parent_product
+                #             })
 
             return True
 

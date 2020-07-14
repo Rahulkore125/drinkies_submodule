@@ -243,7 +243,7 @@ class SaleHnkReport(models.Model):
                 [('date_done', '>', start_order_date), ('date_done', '<', end_order_date),
                  ('state', '=', 'done'), ('is_return_picking', '=', False), ('picking_type_id.code', '=', 'incoming')])
         else:
-            asc_deliveries = self.env['sale.order'].search(
+            asc_deliveries = self.env['stock.picking'].search(
                 [('date_done', '>', start_order_date), ('date_done', '<', end_order_date),
                  ('state', '=', 'done'), ('location_dest_id', '=', self.location_id.id),
                  ('is_return_picking', '=', False), ('picking_type_id.code', '=', 'incoming')])

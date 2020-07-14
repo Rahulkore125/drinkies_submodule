@@ -58,6 +58,7 @@
                      <field name="close_stock"/>
                     <field name="close_stock_units"/>
                     <field name="amount_discount"/>
+                    <field name="asc_delivery"/>
                     <field name="sum_sale_chanel"/>
                     <field name="sum_fp_chanel"/>
                     <field name="sum_grab_chanel"/>

@@ -66,17 +66,20 @@ class SaleHnkReport(models.Model):
                                   day=today_date.day, hour=24 - time_offset, minute=00, second=00)
         if not self.location_id:
             sale_orders = self.env['sale.order'].search(
-                [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date), ('state', '=', 'done')])
+                [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date),
+                 ('state', '=', 'done')])
         else:
             sale_orders = self.env['sale.order'].search(
-                [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date), ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
-
+                [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date),
+                 ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
 
         heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
         magento_demo_simple_product = self.env.ref('magento2_connector.magento_sample_product_consumable')
         magento_demo_service_product = self.env.ref('magento2_connector.magento_sample_product_service')
+        discount_product = self.env['product.product'].search([('is_discount_product', '=', True)])
         heineken_product += magento_demo_service_product
         heineken_product += magento_demo_simple_product
+        heineken_product += discount_product
 
         qty_previous_day = self.with_context(location=self.location_id.id).env['product.product'].browse(
             heineken_product.ids)._compute_quantities_dict(
@@ -101,6 +104,7 @@ class SaleHnkReport(models.Model):
             self._context.get(
                 'from_date'),
             to_date=today_date)
+
         for e in qty_today:
             product = self.env['product.product'].browse(e)
             precision = product.uom_id.factor_inv
@@ -113,6 +117,7 @@ class SaleHnkReport(models.Model):
                 product_ids[e]['damaged'] = 0
                 product_ids[e]['returned'] = 0
                 product_ids[e]['amount_discount'] = 0
+
             else:
                 product_ids[e] = {
                     'product_id': e,
@@ -144,20 +149,18 @@ class SaleHnkReport(models.Model):
                     'close_stock_units': qty_today[e]['qty_available'] * precision,
                     'damaged': 0,
                     'returned': 0,
-                    'amount_discount': 0
+                    'amount_discount': 0,
+                    'asc_delivery': 0
                 }
 
         for sale_order in sale_orders:
-            #compute total discount
-            discount = 0
-            for sale_order_line in sale_order.order_line:
-                if sale_order_line.product_id.is_discount_product:
-                    discount = sale_order_line.price_subtotal
-
             for sale_order_line in sale_order.order_line:
                 if not sale_order_line.is_reward_line and not sale_order_line.is_delivery:
-                    # handle sale
-                    if not sale_order_line.product_id.is_discount_product:
+                    # handle discount
+                    if sale_order_line.product_id.is_discount_product:
+                        product_ids[sale_order_line.product_id.id][
+                            'amount_discount'] += abs(sale_order_line.price_subtotal)
+                    else:
                         # handle amount and quantity
                         if sale_order.team_id.id == sale:
                             product_ids[sale_order_line.product_id.id][
@@ -222,12 +225,8 @@ class SaleHnkReport(models.Model):
                             elif sale_order.payment_method == 'online_payment':
                                 product_ids[sale_order_line.product_id.id][
                                     'amount_lalafood_ol'] += sale_order_line.price_subtotal
-                        # handle amount discount
-                        if abs(discount) > 0:
-                            product_ids[sale_order_line.product_id.id][
-                                'amount_discount'] += sale_order_line.price_subtotal * abs(discount) / sale_order.amount_untaxed
 
-
+        # handle scrap
         scrap = self.env['stock.scrap'].search([('date_scrap', '=', self.date_report), ('state', '=', 'done')])
         for e in scrap:
             product_ids[e.product_id.id]['damaged'] += e.scrap_qty
@@ -237,6 +236,28 @@ class SaleHnkReport(models.Model):
             for f in e.move_ids_without_package:
                 if not f.scrapped:
                     product_ids[f.product_id.id]['returned'] += f.product_uom_qty
+
+        # handle asc delivery
+        if not self.location_id:
+            asc_deliveries = self.env['stock.picking'].search(
+                [('date_done', '>', start_order_date), ('date_done', '<', end_order_date),
+                 ('state', '=', 'done'), ('is_return_picking', '=', False), ('picking_type_id.code', '=', 'incoming')])
+        else:
+            asc_deliveries = self.env['sale.order'].search(
+                [('date_done', '>', start_order_date), ('date_done', '<', end_order_date),
+                 ('state', '=', 'done'), ('location_dest_id', '=', self.location_id.id),
+                 ('is_return_picking', '=', False), ('picking_type_id.code', '=', 'incoming')])
+
+        delivery_quantity = {}
+        for delivery in asc_deliveries:
+            for delivery_line in delivery.move_ids_without_package:
+                if delivery_line.product_id.id in delivery_quantity:
+                    delivery_quantity[delivery_line.product_id.id] += delivery_line.quantity_done
+                else:
+                    delivery_quantity[delivery_line.product_id.id] = delivery_line.quantity_done
+
+        for e in delivery_quantity:
+            product_ids[e]['asc_delivery'] = delivery_quantity[e]
 
         self.env['sale.hnk.report.line'].search([]).unlink()
 
@@ -306,3 +327,4 @@ class SaleHnkReportLine(models.Model):
     close_stock_units = fields.Float(string="UNITS btls/cans (Closing)")
     amount_discount = fields.Float(string="Amount Discount")
     sale_report_id = fields.Many2one('sale.hnk.report')
+    asc_delivery = fields.Float(string="ASC Delivery")

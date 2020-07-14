@@ -195,7 +195,7 @@ class SaleOrderLine(models.Model):
     @api.onchange('product_id')
     def onchange_unit_price(self):
         if self.product_id.id and not self.order_id.partner_id:
-            self.price_unit = self.product_id.list_price
+            self.price_unit = self.product_id.lst_price
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id', 'qty_delivered')
     def _compute_amount(self):

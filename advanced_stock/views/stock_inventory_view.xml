@@ -23,7 +23,7 @@
                                 <field name="partner_id" groups="stock.group_tracking_owner"/>
                                 <field name="unit_theoretical_qty" readonly="1"/>
                                 <field name="theoretical_qty" readonly="1"/>
-                                <field name="unit_real_qty" string="Unit Real Quantity"/>
+                                <field name="unit_real_qty"/>
                                 <field name="product_qty" string="Real Quantity"/>
                                 <field name="state" invisible="True"/>
                             </tree>
@@ -37,7 +37,7 @@
                                 <field name="partner_id"/>
                                 <field name="unit_theoretical_qty" readonly="1"/>
                                 <field name="theoretical_qty" readonly="1"/>
-                                <field name="unit_real_qty" string="Unit Real Quantity"/>
+                                <field name="unit_real_qty"/>
                                 <field name="product_qty" string="Real Quantity"/>
                                 <field name="state" invisible="True"/>
 

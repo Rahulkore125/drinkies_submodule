@@ -1,8 +1,6 @@
-from odoo import api, fields, models, tools
-from odoo.exceptions import UserError
-import sys
-import traceback
-from datetime import datetime, date
+from datetime import datetime
+
+from odoo import models
 
 
 class StockToMagento(models.TransientModel):
@@ -41,19 +39,22 @@ class StockToMagento(models.TransientModel):
         stock_quant_current_product = self.env['stock.quant'].search(
             [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
         # compute quant of varianmanager after update
-        amount_after_after = stock_quant_current_product.quantity * (product_id.deduct_amount_parent_product / product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product)
+        amount_after_after = stock_quant_current_product.quantity * (
+                    product_id.deduct_amount_parent_product / product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product)
         dict_product_update = {}
         for product_variant in product_id.product_tmpl_id.product_variant_ids:
             if product_variant.id != product_id.id:
-                dict_product_update[product_variant.id] = amount_after_after * (product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product / product_variant.deduct_amount_parent_product)
+                dict_product_update[product_variant.id] = amount_after_after * (
+                            product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product * product_id.uom_id.factor_inv / product_variant.deduct_amount_parent_product)
         list_inventory_line = []
         for key in dict_product_update:
             inventory_line = self.env['stock.inventory.line'].sudo().create({
                 'product_id': key,
                 'location_id': location_id.id,
-                'product_qty': dict_product_update[key],
+                'unit_real_qty': dict_product_update[key],
             })
             list_inventory_line.append(inventory_line.id)
+
         stock_inventory = self.env['stock.inventory'].create({
             'name': 'Update other variant of ' + product_id.name,
             'location_id': location_id.id,
@@ -62,6 +63,8 @@ class StockToMagento(models.TransientModel):
             'state': 'draft',
             'line_ids': [(6, 0, list_inventory_line)]
         })
+
+        print(123)
 
         self.sync_quantity_to_magento(location_id=location_id, product_id=product_id, client=client)
         stock_inventory.sudo()._action_done(force_done_variant=True)

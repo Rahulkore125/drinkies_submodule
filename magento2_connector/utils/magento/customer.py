@@ -36,7 +36,7 @@ class Customer(Client):
     def insert(self, customers, backend_id, url, token, context=None):
         array_address = []
         array_customer = []
-        print(array_customer)
+
         for customer in customers:
             magento_customer_id = customer['id']
             name = customer['firstname'] + " " + customer['lastname']
@@ -75,19 +75,19 @@ class Customer(Client):
                     'group_id': group_id
                 })
                 # xoa tat ca cac partner co email bi trung con lai
-                for email_existed in rec_email_existed:
-                    old_partner_child = context.env['res.partner'].search(
-                        [('id', '!=', email_existed.odoo_id.id), ('email', '=', email), ('active', '=', True)])
-                    for partner in old_partner_child:
-                        # cap nhat sale order co lien quan, dinh vs partner o tren
-                        # sale_orders = context.env['magento.sale.order'].search([('partner_id', '=', partner.id)])
-                        # for order in sale_orders:
-                        #     order.update({
-                        #         'partner_id': old_partner_parent.id
-                        #     })
-                        partner.update({
-                            'active': False
-                        })
+                # for email_existed in rec_email_existed:
+                #     old_partner_child = context.env['res.partner'].search(
+                #         [('id', '!=', email_existed.odoo_id.id), ('email', '=', email), ('active', '=', True)])
+                #     for partner in old_partner_child:
+                #         # cap nhat sale order co lien quan, dinh vs partner o tren
+                #         # sale_orders = context.env['magento.sale.order'].search([('partner_id', '=', partner.id)])
+                #         # for order in sale_orders:
+                #         #     order.update({
+                #         #         'partner_id': old_partner_parent.id
+                #         #     })
+                #         partner.update({
+                #             'active': False
+                #         })
                 # update new address if new customer have address
                 if customer['addresses'] and len(customer['addresses']) > 0:
                     # first address

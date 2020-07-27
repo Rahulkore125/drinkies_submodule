@@ -1,9 +1,9 @@
-from odoo import models, api, tools, fields
-from odoo.tools import float_utils, float_compare
-from ...magento2_connector.utils.magento.rest import Client
+from odoo import models, api, fields
 from odoo import tools, _
-from odoo.exceptions import UserError
 from odoo.addons import decimal_precision as dp
+from odoo.tools import float_utils
+from ...magento2_connector.utils.magento.rest import Client
+
 
 class ProductChangeQuantity(models.TransientModel):
     _inherit = "stock.change.product.qty"
@@ -114,23 +114,24 @@ class Inventory(models.Model):
 class InventoryLine(models.Model):
     _inherit = 'stock.inventory.line'
 
-    unit_theoretical_qty = fields.Float('Theoretical Quantity by Unit', compute='_compute_unit_theoretical_qty', store=True)
+    unit_theoretical_qty = fields.Float('Theoretical Quantity by Unit', compute='_compute_unit_theoretical_qty',
+                                        store=True)
     unit_real_qty = fields.Float('Real Quantity by Unit')
     product_qty = fields.Float(
         'Checked Quantity',
-        digits=dp.get_precision('Product Unit of Measure'), default=0, compute='_compute_real_quantity', store= True)
+        digits=dp.get_precision('Product Unit of Measure'), default=0, compute='_compute_real_quantity', store=True)
 
     @api.multi
     def _compute_unit_theoretical_qty(self):
         for rec in self:
-            rec.unit_theoretical_qty = rec.theoretical_qty*rec.product_uom_id.factor_inv
+            rec.unit_theoretical_qty = rec.theoretical_qty * rec.product_uom_id.factor_inv
 
     @api.multi
     @api.depends('unit_real_qty')
     def _compute_real_quantity(self):
         for rec in self:
             if rec.product_uom_id.factor_inv:
-                rec.product_qty = rec.unit_real_qty/rec.product_uom_id.factor_inv
+                rec.product_qty = rec.unit_real_qty / rec.product_uom_id.factor_inv
 
     @api.multi
     @api.depends('theoretical_qty')
@@ -154,3 +155,35 @@ class InventoryLine(models.Model):
                                              line.product_id.property_stock_inventory.id, True)
             vals_list.append(vals)
         return self.env['stock.move'].create(vals_list)
+
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    unit_real_qty = fields.Float('Real Quantity by Unit', default=0.0, readonly=False, compute='_compute_uom_quantity',
+                                 store=True)
+    product_uom_qty = fields.Float(
+        'Initial Demand',
+        digits=dp.get_precision('Product Unit of Measure'),
+        default=0.0, required=True, states={'done': [('readonly', True)]},
+        help="This is the quantity of products from an inventory "
+             "point of view. For moves in the state 'done', this is the "
+             "quantity of products that were actually moved. For other "
+             "moves, this is the quantity of product that is planned to "
+             "be moved. Lowering this quantity does not generate a "
+             "backorder. Changing this quantity on assigned moves affects "
+             "the product reservation, and should be done with care.")
+
+    @api.multi
+    @api.onchange('unit_real_qty')
+    def _compute_real_quantity(self):
+        for rec in self:
+            if rec.product_uom.factor_inv:
+                rec.product_uom_qty = rec.unit_real_qty / rec.product_uom.factor_inv
+
+    @api.multi
+    @api.depends('product_uom_qty')
+    def _compute_uom_quantity(self):
+        for rec in self:
+            if rec.product_uom.factor_inv:
+                rec.unit_real_qty = rec.product_uom_qty * rec.product_uom.factor_inv

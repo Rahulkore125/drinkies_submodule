@@ -173,7 +173,6 @@ class SaleHnkReport(models.Model):
                                     product_ids[sale_order_line.product_id.id][
                                         'amount_sale_ol'] += sale_order_line.price_subtotal
                             elif sale_order.team_id.id == food_panda:
-                                print(sale_order.id)
                                 product_ids[sale_order_line.product_id.id][
                                     'sum_fp_chanel'] += sale_order_line.product_uom_qty
                                 if sale_order.payment_method == 'cod':

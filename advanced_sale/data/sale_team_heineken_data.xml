@@ -13,8 +13,8 @@
          <record id="lazmall" model="crm.team">
             <field name="name">Lazmall</field>
         </record>
-         <record id="lalafood" model="crm.team">
-            <field name="name">Lalafood</field>
+         <record id="pandamart" model="crm.team">
+            <field name="name">Pandamart</field>
         </record>
         <record id="food_panda" model="crm.team">
             <field name="name">Food panda</field>

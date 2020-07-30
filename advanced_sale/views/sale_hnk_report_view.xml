@@ -65,7 +65,7 @@
                     <field name="sum_shopee_chanel"/>
                     <field name="sum_pos_chanel"/>
                     <field name="sum_lazmall_chanel"/>
-                    <field name="sum_lalafood_chanel"/>
+                    <field name="sum_pandamart_chanel"/>
                     <field name="amount_sale_cod"/>
                     <field name="amount_sale_ol"/>
                     <field name="amount_fp_cod"/>
@@ -76,8 +76,8 @@
                     <field name="amount_pos_ol"/>
                     <field name="amount_lazmall_cod"/>
                     <field name="amount_lazmall_ol"/>
-                    <field name="amount_lalafood_cod"/>
-                    <field name="amount_lalafood_ol"/>
+                    <field name="amount_pandamart_cod"/>
+                    <field name="amount_pandamart_ol"/>
                     <field name="amount_grab_cod"/>
                     <field name="amount_grab_ol"/>
                 </tree>

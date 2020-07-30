@@ -39,7 +39,7 @@ class SaleHnkReport(models.Model):
         shopee = self.env.ref('advanced_sale.shopee').id
         pos = self.env.ref('advanced_sale.pos').id
         lazmall = self.env.ref('advanced_sale.lazmall').id
-        lalafood = self.env.ref('advanced_sale.lalafood').id
+        pandamart = self.env.ref('advanced_sale.pandamart').id
 
         if self.compute_at_date == 1:
             if self.from_date_report >= self.to_date_report:
@@ -128,7 +128,7 @@ class SaleHnkReport(models.Model):
                     'sum_shopee_chanel': 0,
                     'sum_lazmall_chanel': 0,
                     'sum_pos_chanel': 0,
-                    'sum_lalafood_chanel': 0,
+                    'sum_pandamart_chanel': 0,
                     'amount_sale_cod': 0,
                     'amount_sale_ol': 0,
                     'amount_fp_cod': 0,
@@ -139,8 +139,8 @@ class SaleHnkReport(models.Model):
                     'amount_pos_ol': 0,
                     'amount_lazmall_cod': 0,
                     'amount_lazmall_ol': 0,
-                    'amount_lalafood_cod': 0,
-                    'amount_lalafood_ol': 0,
+                    'amount_pandamart_cod': 0,
+                    'amount_pandamart_ol': 0,
                     'amount_grab_cod': 0,
                     'amount_grab_ol': 0,
                     'open_stock': qty_previous_day[e]['qty_available'],
@@ -217,15 +217,15 @@ class SaleHnkReport(models.Model):
                                 elif sale_order.payment_method == 'online_payment':
                                     product_ids[sale_order_line.product_id.id][
                                         'amount_lazmall_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == lalafood:
+                            elif sale_order.team_id.id == pandamart:
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_lalafood_chanel'] += sale_order_line.product_uom_qty
+                                    'sum_pandamart_chanel'] += sale_order_line.product_uom_qty
                                 if sale_order.payment_method == 'cod':
                                     product_ids[sale_order_line.product_id.id][
-                                        'amount_lalafood_cod'] += sale_order_line.price_subtotal
+                                        'amount_pandamart_cod'] += sale_order_line.price_subtotal
                                 elif sale_order.payment_method == 'online_payment':
                                     product_ids[sale_order_line.product_id.id][
-                                        'amount_lalafood_ol'] += sale_order_line.price_subtotal
+                                        'amount_pandamart_ol'] += sale_order_line.price_subtotal
                 else:
                     pass
 
@@ -303,7 +303,7 @@ class SaleHnkReportLine(models.Model):
     sum_shopee_chanel = fields.Float(string="Sold Shopee")
     sum_pos_chanel = fields.Float(string="Sold POS")
     sum_lazmall_chanel = fields.Float(string="Sold Lazmall")
-    sum_lalafood_chanel = fields.Float(string="Sold Lalafood")
+    sum_pandamart_chanel = fields.Float(string="Sold Pandamart")
 
     amount_sale_cod = fields.Float(string="Amount Drinkies COD")
     amount_sale_ol = fields.Float(string="Amount Drinkies Online")
@@ -323,8 +323,8 @@ class SaleHnkReportLine(models.Model):
     amount_lazmall_cod = fields.Float(string="Amount Lazmall COD")
     amount_lazmall_ol = fields.Float(string="Amount Lazmall Online")
 
-    amount_lalafood_cod = fields.Float(string="Amount Lalafood COD")
-    amount_lalafood_ol = fields.Float(string="Amount Lalafood Online")
+    amount_pandamart_cod = fields.Float(string="Amount Pandamart COD")
+    amount_pandamart_ol = fields.Float(string="Amount Pandamart Online")
 
     close_stock = fields.Float(string="Closing Stock")
     close_stock_units = fields.Float(string="UNITS btls/cans (Closing)")

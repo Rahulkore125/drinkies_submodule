@@ -1,11 +1,9 @@
+from datetime import datetime, date
+
 from odoo import models, fields, api
 from odoo import tools
 from odoo.addons import decimal_precision as dp
-from datetime import datetime, date
 from ...magento2_connector.utils.magento.rest import Client
-from odoo import tools, _
-from odoo.exceptions import UserError
-from odoo.http import request
 
 
 class SaleOrder(models.Model):
@@ -66,16 +64,22 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm_complete(self):
         for so in self:
-            # for e in so.order_line:
-            # if e.product_id.product_tmpl_id.multiple_sku_one_stock:
-            #     stock_quant = so.env['stock.quant'].search(
-            #         [('location_id', '=', so.location_id.id),
-            #          ('product_id', '=', e.product_id.product_tmpl_id.variant_manage_stock.id)])
-            #
-            #     stock_quant.sudo().write({
-            #         'updated_qty': True,
-            #         'original_qty': stock_quant.original_qty - e.product_uom_qty * e.product_id.deduct_amount_parent_product
-            #     })
+            # find all product template manage multiple sku one stock
+            multiple_sku_tmpl = {}
+            for line in so.order_line:
+                if line.product_id.product_tmpl_id.multiple_sku_one_stock:
+                    if line.product_id.product_tmpl_id.id in multiple_sku_tmpl:
+                        multiple_sku_tmpl[line.product_id.product_tmpl_id.id] = \
+                            multiple_sku_tmpl[
+                                line.product_id.product_tmpl_id.id] - line.product_uom_qty * line.product_id.deduct_amount_parent_product
+                    else:
+                        variant_manage_stock = line.product_id.product_tmpl_id.variant_manage_stock
+                        original_quantity = self.env['stock.quant'].search(
+                            [('location_id', '=', so.location_id.id), ('product_id', '=', variant_manage_stock.id)])
+                        multiple_sku_tmpl[
+                            line.product_id.product_tmpl_id.id] = original_quantity.quantity * variant_manage_stock.deduct_amount_parent_product - line.product_uom_qty * line.product_id.deduct_amount_parent_product
+
+                        # determine the remaining stock
 
             stock_pickings = so.env['stock.picking'].search(
                 [('sale_id', '=', so.id), ('picking_type_id.code', '=', 'outgoing')])
@@ -137,17 +141,20 @@ class SaleOrder(models.Model):
                 'state': 'complete',
                 'status': 'complete',
             })
-            for line in so.order_line:
-                ## after action_done(), sync stock to magento
+
+            # update stock for variant of multiple sku one stock
+            magento_backend = self.env['magento.backend'].search([], limit=1)
+            client = Client(magento_backend.web_url, magento_backend.access_token, True)
+            if len(multiple_sku_tmpl) > 0:
                 stock2magento = self.env['stock.to.magento']
-                magento_backend = self.env['magento.backend'].search([], limit=1)
-                client = Client(magento_backend.web_url, magento_backend.access_token, True)
-                if line.product_id.product_tmpl_id.multiple_sku_one_stock:
-                    stock2magento.force_update_inventory_special_keg(location_id=self.location_id,
-                                                                     product_id=line.product_id, client=client)
-                else:
-                    stock2magento.sync_quantity_to_magento(location_id=self.location_id,
-                                                           product_id=line.product_id, client=client)
+                stock2magento.force_update_inventory_special_keg(location_id=so.location_id,
+                                                                 location_dest_id=False,
+                                                                 multiple_sku_tmpl=multiple_sku_tmpl, client=client,
+                                                                 type='outgoing')
+
+            # sync stock to magagento
+            # stock2magento.sync_quantity_to_magento(location_id=self.location_id,
+            #                                        product_id=line.product_id, client=client)
 
     @api.depends('computed_discount_total')
     def _amount_all(self):

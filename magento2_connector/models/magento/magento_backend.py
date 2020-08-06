@@ -920,14 +920,7 @@ class MagentoBackend(models.Model):
             time_pull = datetime(pull_history.sync_date.year, month=pull_history.sync_date.month,
                                  day=pull_history.sync_date.day, hour=00, minute=00, second=00)
             orders_updated = order.list_order_updated_at_after_sync(time_pull)
-            # else:
-            #     # first pull
-            #     self.env['magento.pull.history'].create({
-            #         'name': 'sale_orders',
-            #         'sync_date': datetime.today(),
-            #         'backend_id': backend_id
-            #     })
-            #     orders_updated = order.list(currentPage=, pageSize=self.sale_orders_pageSize)
+
             # todo chua co xu ly truong hop cancel khi da complete
             for e in orders_updated['items']:
                 exist_order = self.env['magento.sale.order'].search([('external_id', '=', e['entity_id'])])

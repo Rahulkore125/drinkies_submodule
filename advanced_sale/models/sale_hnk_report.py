@@ -154,6 +154,7 @@ class SaleHnkReport(models.Model):
                 }
 
         for sale_order in sale_orders:
+            discount = 0
             for sale_order_line in sale_order.order_line:
                 if sale_order_line.product_id.id in product_ids:
                     if not sale_order_line.is_reward_line and not sale_order_line.is_delivery:
@@ -161,6 +162,7 @@ class SaleHnkReport(models.Model):
                         if sale_order_line.product_id.is_discount_product:
                             product_ids[sale_order_line.product_id.id][
                                 'amount_discount'] += abs(sale_order_line.price_subtotal)
+                            discount += abs(sale_order_line.price_subtotal)
                         else:
                             # handle amount and quantity
                             if sale_order.team_id.id == sale:

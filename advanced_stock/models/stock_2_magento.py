@@ -33,38 +33,71 @@ class StockToMagento(models.TransientModel):
         #                 ('Can not update quantity product on source magento - %s') % tools.ustr(a))
         pass
 
-    def force_update_inventory_special_keg(self, location_id, product_id, client):
-        # step1: compute all product variant quantity
-        # get quant of product_id
-        stock_quant_current_product = self.env['stock.quant'].search(
-            [('location_id', '=', location_id.id), ('product_id', '=', product_id.id)])
-        # compute quant of varianmanager after update
-        amount_after_after = stock_quant_current_product.quantity * (
-                    product_id.deduct_amount_parent_product / product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product)
-        dict_product_update = {}
-        for product_variant in product_id.product_tmpl_id.product_variant_ids:
-            if product_variant.id != product_id.id:
-                dict_product_update[product_variant.id] = amount_after_after * (
-                            product_id.product_tmpl_id.variant_manage_stock.deduct_amount_parent_product * product_id.uom_id.factor_inv / product_variant.deduct_amount_parent_product)
-        list_inventory_line = []
-        for key in dict_product_update:
-            inventory_line = self.env['stock.inventory.line'].sudo().create({
-                'product_id': key,
-                'location_id': location_id.id,
-                'unit_real_qty': dict_product_update[key],
-            })
-            list_inventory_line.append(inventory_line.id)
+    def force_update_inventory_special_keg(self, location_id, location_dest_id, multiple_sku_tmpl, client, type):
+        if type in ['incoming', 'outgoing','adjustment']:
+            for e in multiple_sku_tmpl:
+                product_tmpl = self.env['product.template'].search([('id', '=', e)])
+                list_inventory_line = []
+                for key in product_tmpl.product_variant_ids:
+                    inventory_line = self.env['stock.inventory.line'].sudo().create({
+                        'product_id': key.id,
+                        'location_id': location_id.id,
+                        'unit_real_qty': multiple_sku_tmpl[e] / key.deduct_amount_parent_product,
+                    })
+                    list_inventory_line.append(inventory_line.id)
 
-        stock_inventory = self.env['stock.inventory'].create({
-            'name': 'Update other variant of ' + product_id.name,
-            'location_id': location_id.id,
-            'date': datetime.now(),
-            'filter': 'partial',
-            'state': 'draft',
-            'line_ids': [(6, 0, list_inventory_line)]
-        })
+                stock_inventory = self.env['stock.inventory'].create({
+                    'name': 'Update other variant of ' + product_tmpl.name,
+                    'location_id': location_id.id,
+                    'date': datetime.now(),
+                    'filter': 'partial',
+                    'state': 'draft',
+                    'line_ids': [(6, 0, list_inventory_line)]
+                })
 
-        print(123)
+                # self.sync_quantity_to_magento(location_id=location_id, product_id=product_id, client=client)
+                stock_inventory.sudo()._action_done(force_done_variant=True)
 
-        self.sync_quantity_to_magento(location_id=location_id, product_id=product_id, client=client)
-        stock_inventory.sudo()._action_done(force_done_variant=True)
+        if type in ['internal']:
+            for e in multiple_sku_tmpl:
+                product_tmpl = self.env['product.template'].search([('id', '=', e)])
+                # update increase stock
+                list_inventory_line = []
+                for key in product_tmpl.product_variant_ids:
+                    inventory_line = self.env['stock.inventory.line'].sudo().create({
+                        'product_id': key.id,
+                        'location_id': location_dest_id.id,
+                        'unit_real_qty': multiple_sku_tmpl[e]['increase'] / key.deduct_amount_parent_product,
+                    })
+                    list_inventory_line.append(inventory_line.id)
+
+                stock_inventory = self.env['stock.inventory'].create({
+                    'name': 'Update other variant of ' + product_tmpl.name,
+                    'location_id': location_dest_id.id,
+                    'date': datetime.now(),
+                    'filter': 'partial',
+                    'state': 'draft',
+                    'line_ids': [(6, 0, list_inventory_line)]
+                })
+
+                stock_inventory.sudo()._action_done(force_done_variant=True)
+
+                # update decrease stock
+                list_inventory_line = []
+                for key in product_tmpl.product_variant_ids:
+                    inventory_line = self.env['stock.inventory.line'].sudo().create({
+                        'product_id': key.id,
+                        'location_id': location_id.id,
+                        'unit_real_qty': multiple_sku_tmpl[e]['decrease'] / key.deduct_amount_parent_product,
+                    })
+                    list_inventory_line.append(inventory_line.id)
+
+                stock_inventory = self.env['stock.inventory'].create({
+                    'name': 'Update other variant of ' + product_tmpl.name,
+                    'location_id': location_id.id,
+                    'date': datetime.now(),
+                    'filter': 'partial',
+                    'state': 'draft',
+                    'line_ids': [(6, 0, list_inventory_line)]
+                })
+                stock_inventory.sudo()._action_done(force_done_variant=True)

@@ -238,7 +238,8 @@ class Product(Client):
                             list_magento_category = []
                             for rec in magento_categories:
                                 list_magento_category.append(rec['category_id'])
-                            total_category = context.env['magento.product.category'].search([('backend_id', '=', backend_id)])
+                            total_category = context.env['magento.product.category'].search(
+                                [('backend_id', '=', backend_id)])
                             for cate in total_category:
                                 if str(cate.external_id) in list_magento_category:
                                     categories.append(cate.odoo_id.id)

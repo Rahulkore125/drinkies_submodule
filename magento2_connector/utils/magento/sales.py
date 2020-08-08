@@ -407,7 +407,7 @@ class Order(Client):
                                     'product_uom': 1,
                                     'is_delivery': False}))
                     if coupon_code != '':
-                        discount_amount = order['discount_amount']
+                        discount_amount = abs(order['discount_amount'])
                         order_line_discount = context.env.ref('magento2_connector.discount_record')
                         order_lines.append(
                             (0, 0, {'name': ("Apply discount code: " + str(coupon_code)) if coupon_code != '' else None,

@@ -154,82 +154,80 @@ class SaleHnkReport(models.Model):
                 }
 
         for sale_order in sale_orders:
-            discount = 0
+            # handle discount
+            product_ids[discount_product.id][
+                        'amount_discount'] += abs(sale_order.computed_discount_total)
+            # handle information of product
             for sale_order_line in sale_order.order_line:
                 if sale_order_line.product_id.id in product_ids:
-                    if not sale_order_line.is_reward_line and not sale_order_line.is_delivery:
-                        # handle discount
-                        if sale_order_line.product_id.is_discount_product:
+                    if not sale_order_line.is_reward_line and not sale_order_line.is_delivery and not sale_order_line.product_id.is_discount_product:
+                        # handle amount and quantity
+                        discount = sale_order.computed_discount_total * sale_order_line.price_subtotal / sale_order.amount_untaxed
+                        if sale_order.team_id.id == sale:
                             product_ids[sale_order_line.product_id.id][
-                                'amount_discount'] += abs(sale_order_line.price_subtotal)
-                            discount += abs(sale_order_line.price_subtotal)
-                        else:
-                            # handle amount and quantity
-                            if sale_order.team_id.id == sale:
+                                'sum_sale_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_sale_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_sale_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_sale_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == food_panda:
+                                    'amount_sale_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_fp_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_fp_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_fp_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == grab:
+                                    'amount_sale_ol'] += (sale_order_line.price_subtotal - discount)
+                        elif sale_order.team_id.id == food_panda:
+                            product_ids[sale_order_line.product_id.id][
+                                'sum_fp_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_grab_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_grab_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_grab_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == shopee:
+                                    'amount_fp_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_shopee_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_shopee_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_shopee_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == pos:
+                                    'amount_fp_ol'] += (sale_order_line.price_subtotal - discount)
+                        elif sale_order.team_id.id == grab:
+                            product_ids[sale_order_line.product_id.id][
+                                'sum_grab_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_pos_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_pos_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_pos_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == lazmall:
+                                    'amount_grab_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_lazmall_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_lazmall_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_lazmall_ol'] += sale_order_line.price_subtotal
-                            elif sale_order.team_id.id == pandamart:
+                                    'amount_grab_ol'] += (sale_order_line.price_subtotal - discount)
+                        elif sale_order.team_id.id == shopee:
+                            product_ids[sale_order_line.product_id.id][
+                                'sum_shopee_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
                                 product_ids[sale_order_line.product_id.id][
-                                    'sum_pandamart_chanel'] += sale_order_line.product_uom_qty
-                                if sale_order.payment_method == 'cod':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_pandamart_cod'] += sale_order_line.price_subtotal
-                                elif sale_order.payment_method == 'online_payment':
-                                    product_ids[sale_order_line.product_id.id][
-                                        'amount_pandamart_ol'] += sale_order_line.price_subtotal
-                else:
-                    pass
+                                    'amount_shopee_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_shopee_ol'] += (sale_order_line.price_subtotal - discount)
+                        elif sale_order.team_id.id == pos:
+                            product_ids[sale_order_line.product_id.id][
+                                'sum_pos_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_pos_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_pos_ol'] += (sale_order_line.price_subtotal - discount)
+                        elif sale_order.team_id.id == lazmall:
+                            product_ids[sale_order_line.product_id.id][
+                                'sum_lazmall_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_lazmall_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_lazmall_ol'] += (sale_order_line.price_subtotal - discount)
+                        elif sale_order.team_id.id == pandamart:
+                            product_ids[sale_order_line.product_id.id][
+                                'sum_pandamart_chanel'] += sale_order_line.product_uom_qty
+                            if sale_order.payment_method == 'cod':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_pandamart_cod'] += (sale_order_line.price_subtotal - discount)
+                            elif sale_order.payment_method == 'online_payment':
+                                product_ids[sale_order_line.product_id.id][
+                                    'amount_pandamart_ol'] += (sale_order_line.price_subtotal - discount)
+                        product_ids[sale_order_line.product_id.id][
+                            'amount_discount'] += discount
 
         # handle scrap
         scrap = self.env['stock.scrap'].search([('date_scrap', '=', self.date_report), ('state', '=', 'done')])

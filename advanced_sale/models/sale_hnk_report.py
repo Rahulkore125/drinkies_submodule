@@ -254,10 +254,11 @@ class SaleHnkReport(models.Model):
         delivery_quantity = {}
         for delivery in asc_deliveries:
             for delivery_line in delivery.move_ids_without_package:
-                if delivery_line.product_id.id in delivery_quantity:
-                    delivery_quantity[delivery_line.product_id.id] += delivery_line.quantity_done
-                else:
-                    delivery_quantity[delivery_line.product_id.id] = delivery_line.quantity_done
+                if not delivery_line.scrapped:
+                    if delivery_line.product_id.id in delivery_quantity:
+                        delivery_quantity[delivery_line.product_id.id] += delivery_line.quantity_done
+                    else:
+                        delivery_quantity[delivery_line.product_id.id] = delivery_line.quantity_done
 
         for e in delivery_quantity:
             product_ids[e]['asc_delivery'] = delivery_quantity[e]

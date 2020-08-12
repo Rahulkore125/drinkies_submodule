@@ -76,7 +76,8 @@ class Inventory(models.Model):
                 for line in self.line_ids:
                     if line.product_id.product_tmpl_id.multiple_sku_one_stock:
                         if line.product_id.product_tmpl_id.id in multiple_sku_tmpl:
-                            multiple_sku_tmpl[line.product_id.product_tmpl_id.id] = line.product_qty * line.product_id.deduct_amount_parent_product
+                            multiple_sku_tmpl[
+                                line.product_id.product_tmpl_id.id] = line.product_qty * line.product_id.deduct_amount_parent_product
                         else:
                             multiple_sku_tmpl[
                                 line.product_id.product_tmpl_id.id] = line.product_qty * line.product_id.deduct_amount_parent_product

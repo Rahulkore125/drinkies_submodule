@@ -29,7 +29,8 @@ class StockPickingInherit(models.Model):
             client = Client(magento_backend.web_url, magento_backend.access_token, True)
             if len(multiple_sku_tmpl) > 0:
                 stock2magento = self.env['stock.to.magento']
-                stock2magento.force_update_inventory_special_keg(location_id=self.location_id, location_dest_id=self.location_dest_id,
+                stock2magento.force_update_inventory_special_keg(location_id=self.location_id,
+                                                                 location_dest_id=self.location_dest_id,
                                                                  multiple_sku_tmpl=multiple_sku_tmpl,
                                                                  client=client, type='outgoing')
 
@@ -68,10 +69,10 @@ class StockPickingInherit(models.Model):
             client = Client(magento_backend.web_url, magento_backend.access_token, True)
             if len(multiple_sku_tmpl) > 0:
                 stock2magento = self.env['stock.to.magento']
-                stock2magento.force_update_inventory_special_keg(location_id=self.location_id,location_dest_id=self.location_dest_id,
+                stock2magento.force_update_inventory_special_keg(location_id=self.location_id,
+                                                                 location_dest_id=self.location_dest_id,
                                                                  multiple_sku_tmpl=multiple_sku_tmpl,
-                                                                 client=client,type='internal')
-
+                                                                 client=client, type='internal')
 
         if self.picking_type_id.code in ['incoming']:
             multiple_sku_tmpl = {}
@@ -95,7 +96,8 @@ class StockPickingInherit(models.Model):
             client = Client(magento_backend.web_url, magento_backend.access_token, True)
             if len(multiple_sku_tmpl) > 0:
                 stock2magento = self.env['stock.to.magento']
-                stock2magento.force_update_inventory_special_keg(location_id=self.location_dest_id,location_dest_id=self.location_dest_id,
+                stock2magento.force_update_inventory_special_keg(location_id=self.location_dest_id,
+                                                                 location_dest_id=self.location_dest_id,
                                                                  multiple_sku_tmpl=multiple_sku_tmpl,
                                                                  client=client, type='incoming')
 

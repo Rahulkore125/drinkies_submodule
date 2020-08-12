@@ -34,7 +34,7 @@ class StockToMagento(models.TransientModel):
         pass
 
     def force_update_inventory_special_keg(self, location_id, location_dest_id, multiple_sku_tmpl, client, type):
-        if type in ['incoming', 'outgoing','adjustment']:
+        if type in ['incoming', 'outgoing', 'adjustment']:
             for e in multiple_sku_tmpl:
                 product_tmpl = self.env['product.template'].search([('id', '=', e)])
                 list_inventory_line = []

@@ -156,7 +156,7 @@ class SaleHnkReport(models.Model):
         for sale_order in sale_orders:
             # handle discount
             product_ids[discount_product.id][
-                        'amount_discount'] += abs(sale_order.computed_discount_total)
+                'amount_discount'] += abs(sale_order.computed_discount_total)
             # handle information of product
             for sale_order_line in sale_order.order_line:
                 if sale_order_line.product_id.id in product_ids:
@@ -230,11 +230,15 @@ class SaleHnkReport(models.Model):
                             'amount_discount'] += discount
 
         # handle scrap
-        scrap = self.env['stock.scrap'].search([('date_scrap', '=', self.date_report), ('state', '=', 'done')])
+        scrap = self.env['stock.scrap'].search(
+            [('date_scrap', '=', self.date_report), ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
         for e in scrap:
             product_ids[e.product_id.id]['damaged'] += e.scrap_qty
+
+        # handle return
         return_picking = self.env['stock.picking'].search(
-            [('date_return', '=', self.date_report), ('is_return_picking', '=', True), ('state', '=', 'done')])
+            [('date_return', '=', self.date_report), ('is_return_picking', '=', True), ('state', '=', 'done'),
+             ('location_dest_id', '=', self.location_id.id)])
         for e in return_picking:
             for f in e.move_ids_without_package:
                 if not f.scrapped:
@@ -254,10 +258,11 @@ class SaleHnkReport(models.Model):
         delivery_quantity = {}
         for delivery in asc_deliveries:
             for delivery_line in delivery.move_ids_without_package:
-                if delivery_line.product_id.id in delivery_quantity:
-                    delivery_quantity[delivery_line.product_id.id] += delivery_line.quantity_done
-                else:
-                    delivery_quantity[delivery_line.product_id.id] = delivery_line.quantity_done
+                if not delivery_line.scrapped:
+                    if delivery_line.product_id.id in delivery_quantity:
+                        delivery_quantity[delivery_line.product_id.id] += delivery_line.quantity_done
+                    else:
+                        delivery_quantity[delivery_line.product_id.id] = delivery_line.quantity_done
 
         for e in delivery_quantity:
             product_ids[e]['asc_delivery'] = delivery_quantity[e]

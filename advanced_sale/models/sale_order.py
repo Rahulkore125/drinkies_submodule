@@ -28,7 +28,7 @@ class SaleOrder(models.Model):
     # owner location can see own SO, invoice
     user_related = fields.Many2one(string="Owner location", comodel_name="res.users", compute="compute_user_related",
                                    store=True)
-    delivery_date = fields.Datetime(string='Delivery date')
+    delivery_date = fields.Datetime(string='Delivery date', track_visibility='onchange')
 
     @api.depends('location_id')
     def compute_user_related(self):

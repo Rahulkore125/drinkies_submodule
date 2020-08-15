@@ -435,23 +435,23 @@ class MagentoBackend(models.Model):
             page_size = self.products_pageSize
 
             # sync product category
-            product_categories = pro.list_categories()
-            pull_product_category_history = self.env['magento.pull.history'].search(
-                [('backend_id', '=', backend_id), ('name', '=', 'categories')])
-            if pull_product_category_history:
-                # second pull
-                pro.update_product_categories(product_categories, backend_id, self)
-                pull_product_category_history.write({
-                    'sync_date': datetime.today()
-                })
-            else:
-                # first pull
-                pro.insert_product_category(product_categories, backend_id, self)
-                self.env['magento.pull.history'].create({
-                    'name': 'categories',
-                    'sync_date': datetime.today(),
-                    'backend_id': backend_id
-                })
+            # product_categories = pro.list_categories()
+            # pull_product_category_history = self.env['magento.pull.history'].search(
+            #     [('backend_id', '=', backend_id), ('name', '=', 'categories')])
+            # if pull_product_category_history:
+            #     # second pull
+            #     pro.update_product_categories(product_categories, backend_id, self)
+            #     pull_product_category_history.write({
+            #         'sync_date': datetime.today()
+            #     })
+            # else:
+            #     # first pull
+            #     pro.insert_product_category(product_categories, backend_id, self)
+            #     self.env['magento.pull.history'].create({
+            #         'name': 'categories',
+            #         'sync_date': datetime.today(),
+            #         'backend_id': backend_id
+            #     })
 
             if page_size > 0:
                 current_page = 0

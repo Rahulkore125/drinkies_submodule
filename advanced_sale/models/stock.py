@@ -58,17 +58,18 @@ class StockReturnPicking(models.TransientModel):
             [('id', '=', wizard.picking_id.id)])
         origin_picking.has_return_picking = True
 
-        self.env.cr.execute(
-            """UPDATE sale_order SET state = %s WHERE id = %s""", ('cancel', picking.sale_id.id))
+        if picking.sale_id.id:
+            self.env.cr.execute(
+                """UPDATE sale_order SET state = %s WHERE id = %s""", ('cancel', picking.sale_id.id))
 
-        magento_backend = self.env['magento.backend'].search([], limit=1)
-        client = Client(magento_backend.web_url, magento_backend.access_token, True)
-        if len(multiple_sku_tmpl) > 0:
-            stock2magento = self.env['stock.to.magento']
-            stock2magento.force_update_inventory_special_keg(location_id=picking.location_dest_id,
-                                                             location_dest_id=False,
-                                                             multiple_sku_tmpl=multiple_sku_tmpl, client=client,
-                                                             type='incoming')
+            magento_backend = self.env['magento.backend'].search([], limit=1)
+            client = Client(magento_backend.web_url, magento_backend.access_token, True)
+            if len(multiple_sku_tmpl) > 0:
+                stock2magento = self.env['stock.to.magento']
+                stock2magento.force_update_inventory_special_keg(location_id=picking.location_dest_id,
+                                                                 location_dest_id=False,
+                                                                 multiple_sku_tmpl=multiple_sku_tmpl, client=client,
+                                                                 type='incoming')
 
         action = self.env['sale.order'].browse(picking.sale_id.id).action_view_delivery()
 

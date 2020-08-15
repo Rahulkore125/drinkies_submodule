@@ -716,20 +716,47 @@ class MagentoBackend(models.Model):
                             ('cancel', exist_order.odoo_id.id))
 
     def fetch_source(self):
-        url = self.web_url
-        token = self.access_token
-        location = Location(url, token, True)
-        backend_id = self.id
-        pull_history = self.env['magento.pull.history'].search(
-            [('backend_id', '=', backend_id), ('name', '=', 'sources')])
-        sources = location.list_all_sources()
-        location.insert_source(sources['items'], backend_id, url, token, self)
-        if not len(pull_history) > 0:
-            self.env['magento.pull.history'].create({
-                'name': 'sources',
-                'sync_date': datetime.today(),
-                'backend_id': backend_id
-            })
+        if not self.auto_fetching:
+            url = self.web_url
+            token = self.access_token
+            location = Location(url, token, True)
+            backend_id = self.id
+            pull_history = self.env['magento.pull.history'].search(
+                [('backend_id', '=', backend_id), ('name', '=', 'sources')])
+            sources = location.list_all_sources()
+            location.insert_source(sources['items'], backend_id, url, token, self)
+            if not len(pull_history) > 0:
+                self.env['magento.pull.history'].create({
+                    'name': 'sources',
+                    'sync_date': datetime.today(),
+                    'backend_id': backend_id
+                })
+            else:
+                self.env['magento.pull.history'].write({
+                    'sync_date': datetime.today(),
+                })
+            return {
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'popup.dialog',
+                'target': 'new',
+                'context': {
+                    'default_message': "Fetch sources successful"
+                },
+            }
+        else:
+            return {
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'popup.dialog',
+                'target': 'new',
+                'context': {
+                    'default_message': "Sources are fetching by schedule action, you can fetch sale orders manually after schedule action finish"
+                },
+            }
+
 
     @api.multi
     def auto_fetch_magento_data(self):

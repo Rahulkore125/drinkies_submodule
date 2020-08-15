@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 # -*- coding: UTF-8 -*-
-from bs4 import BeautifulSoup
 
 from odoo.exceptions import UserError
 from odoo.http import request
@@ -46,12 +45,6 @@ class Product(Client):
             # product_type_magento = 'magento_'+str(product['type_id'])
             # check product neu co weight thi la comsumable, neu ko co weight la service
             custom_attributes = product['custom_attributes']
-            description = ""
-            for rec in custom_attributes:
-                if rec['attribute_code'] == 'short_description':
-                    description = rec['value']
-                    description = BeautifulSoup(description).get_text()
-                    break
             # odoo
             name = product['name']
             if 'price' in product:
@@ -145,7 +138,6 @@ class Product(Client):
                         'magento_product_type': 'magento_' + str(product['type_id']),
                         'purchase_ok': purchase_ok,
                         'is_magento_product': True,
-                        'description': description
                     })
                 else:
                     odoo_product_template.append({
@@ -167,7 +159,6 @@ class Product(Client):
                         'magento_product_type': 'magento_' + str(product['type_id']),
                         'attribute_line_ids': attribute_ids,
                         'is_magento_product': True,
-                        'description': description
                     })
                     extension_attributes = product['extension_attributes']
                     if 'configurable_product_links' in extension_attributes:
@@ -217,12 +208,6 @@ class Product(Client):
                         else:
                             price = 0
                         custom_attributes = product['custom_attributes']
-                        description = ""
-                        for rec in custom_attributes:
-                            if rec['attribute_code'] == 'short_description':
-                                description = rec['value']
-
-                                break
                         # add category
                         categories = []
                         if 'category_links' in product['extension_attributes']:
@@ -275,7 +260,6 @@ class Product(Client):
                                 'magento_product_type': product_type_magento,
                                 'purchase_ok': purchase_ok,
                                 'is_magento_product': True,
-                                'description': description
                             })
                         else:
                             magento_product = context.env['magento.product.product'].search(
@@ -288,7 +272,7 @@ class Product(Client):
                                         {'magento_sale_price': price, 'default_code': sku,
                                          'magento_product_name': name})
                                     magento_product.odoo_id.product_tmpl_id.write(
-                                        {'description': description, 'default_code': parent_sku}
+                                        { 'default_code': parent_sku}
                                     )
                                 else:
                                     parent_sku = magento_product.odoo_id.product_tmpl_id.default_code
@@ -296,7 +280,7 @@ class Product(Client):
                                         {'name': name, 'list_price': price, 'magento_sale_price': price,
                                          'default_code': sku})
                                     magento_product.odoo_id.product_tmpl_id.write(
-                                        {'description': description, 'default_code': parent_sku}
+                                        {'default_code': parent_sku}
                                     )
                             else:
                                 if not (external_product_id in product_children):
@@ -318,7 +302,6 @@ class Product(Client):
                                         'magento_product_type': product_type_magento,
                                         'purchase_ok': purchase_ok,
                                         'is_magento_product': True,
-                                        'description': description,
                                         'is_heineken_product': True
                                     })
                                 magento_product_product.append((external_product_id, backend_id))

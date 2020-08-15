@@ -98,14 +98,8 @@ class StockScrap(models.Model):
     date_scrap = fields.Date()
 
     @api.onchange('product_id')
-    def onchange_product_id(self):
-        if self.product_id:
-            pass
-
-    @api.onchange('product_id')
     def _get_domain_product_uom_id(self):
         unit_measure = self.env.ref('uom.product_uom_unit').id
-        # product_uom = self.product_id.uom_id.id
         return {'domain': {'product_uom_id': [('id', 'in', [unit_measure])]}}
 
     def action_validate(self):
@@ -120,7 +114,7 @@ class StockScrap(models.Model):
             multiple_sku_tmpl[
                 self.product_id.product_tmpl_id.id] = original_quantity.quantity * variant_manage_stock.deduct_amount_parent_product - self.scrap_qty / self.product_id.uom_id.factor_inv * self.product_id.deduct_amount_parent_product
 
-        a = super(StockScrap, self).action_validate()
+        result = super(StockScrap, self).action_validate()
         if len(multiple_sku_tmpl) > 0:
             magento_backend = self.env['magento.backend'].search([], limit=1)
             client = Client(magento_backend.web_url, magento_backend.access_token, True)
@@ -131,4 +125,4 @@ class StockScrap(models.Model):
                                                                  multiple_sku_tmpl=multiple_sku_tmpl, client=client,
                                                                  type='outgoing')
 
-        return a
+        return result

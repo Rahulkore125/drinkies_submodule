@@ -100,14 +100,6 @@
                         </div>
                     </t>
                     <t t-name="MagentoBackendBodySalePurchase">
-                        <div class="col-5 o_kanban_primary_left">
-                            <t>
-                                <button type="action" name="%(magento_operation_quickly_action)d"
-                                        class="btn btn-primary ">
-                                    <span>Perform Operation</span>
-                                </button>
-                            </t>
-                        </div>
                         <div class="col-7 o_kanban_primary_right">
                             <div class="row">
                                 <div class="col-7">

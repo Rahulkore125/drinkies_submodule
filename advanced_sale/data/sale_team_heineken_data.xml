@@ -22,9 +22,5 @@
         <record id="grab" model="crm.team">
             <field name="name">Grab</field>
         </record>
-
-<!--        <delete model="crm.team" search="[('id','=',ref('sales_team.team_sales_department'))]"/>-->
-<!--        <delete model="crm.team" search="[('id','=',ref('sales_team.crm_team_1'))]"/>-->
-<!--        <delete model="crm.team" search="[('id','=',ref('sales_team.salesteam_website_sales'))]"/>-->
     </data>
 </odoo>

@@ -32,9 +32,6 @@
                 </xpath>
                 <xpath expr="//field[@name='mobile']" position="replace">
                 </xpath>
-<!--                <xpath expr="//page[1]" position="attributes">-->
-<!--                    <attribute name="invisible">1</attribute>-->
-<!--                </xpath>-->
                 <xpath expr="//page[2]" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>

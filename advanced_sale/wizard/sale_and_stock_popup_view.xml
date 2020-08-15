@@ -15,11 +15,8 @@
                                    attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
                             <field name="to_date_report"
                                    attrs="{'invisible': [('compute_at_date', '=', 0)], 'required': [('compute_at_date', '=', 1)]}"/>
-<!--                            <field name="product_test"/>-->
                         </group>
                         <footer>
-<!--                            <button name="generate_report_test" type="object" class="oe_highlight"-->
-<!--                                    string="Generate Report"/>-->
                             <button name="generate_report" type="object" class="oe_highlight"
                                     string="Generate Report"/>
                             <button string="Discard" class="oe_highlight" special="cancel"/>

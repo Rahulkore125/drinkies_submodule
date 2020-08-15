@@ -9,9 +9,6 @@ class StockReturnPicking(models.TransientModel):
     def create_returns(self):
         context = dict(self._context or {})
         order = self.env['stock.picking'].browse(context.get('active_ids')).sale_id
-        # if order.is_magento_sale_order:
-        #     return super(StockReturnPicking, self).create_returns()
-        # else:
         action = super(StockReturnPicking, self).create_returns()
         if order:
             refund = self.env['account.invoice.refund'].create({

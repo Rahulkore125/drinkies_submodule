@@ -56,15 +56,11 @@ class SaleOrder(models.Model):
         for rec in self:
             rec.number_of_sale_order_line = len(rec.order_line)
 
-    @api.model
-    def create(self, vals_list):
-        res = super(SaleOrder, self).create(vals_list)
-        return res
-
     @api.multi
     def action_confirm_complete(self):
         for so in self:
             # find all product template manage multiple sku one stock
+            # determine the remaining stock
             multiple_sku_tmpl = {}
             for line in so.order_line:
                 if line.product_id.product_tmpl_id.multiple_sku_one_stock:
@@ -78,8 +74,6 @@ class SaleOrder(models.Model):
                             [('location_id', '=', so.location_id.id), ('product_id', '=', variant_manage_stock.id)])
                         multiple_sku_tmpl[
                             line.product_id.product_tmpl_id.id] = original_quantity.quantity * variant_manage_stock.deduct_amount_parent_product - line.product_uom_qty * line.product_id.deduct_amount_parent_product
-
-                        # determine the remaining stock
 
             stock_pickings = so.env['stock.picking'].search(
                 [('sale_id', '=', so.id), ('picking_type_id.code', '=', 'outgoing')])
@@ -104,12 +98,9 @@ class SaleOrder(models.Model):
                     'original_invoice': True,
                     'order_id': so.id
                 })
-                # print('ste_' + rec.magento_bind_ids.state)
+
                 invoice.action_invoice_open()
-                # if rec.is_magento_sale_order and rec.magento_bind_ids.state != 'complete':
-                #     print('not_done')
-                #     return result
-                # else:
+
                 if invoice.state != 'open':
                     invoice.state = 'open'
                 journal_id = 'cod'
@@ -184,20 +175,6 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'), default=0.0)
-
-    # @api.multi
-    # @api.depends('order_id.estimate_discount_total')
-    # def _compute_discount_order_line(self):
-    #     for rec in self:
-    #         sum = 0
-    #         for e in rec.order_id.order_line:
-    #             if not e.is_reward_line and not e.is_delivery:
-    #                 sum += e.price_subtotal
-    #         if sum > 0:
-    #             each_line_order_discount = rec.order_id.computed_discount_total / sum * 100
-    #             for e in rec.order_id.order_line:
-    #                 if not e.is_reward_line and not e.is_delivery:
-    #                     e.discount = each_line_order_discount
 
     @api.onchange('product_id')
     def onchange_unit_price(self):

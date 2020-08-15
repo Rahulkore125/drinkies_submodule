@@ -56,7 +56,6 @@
             </field>
         </record>
 
-        <!-- Inherit Form View to Modify it -->
         <record id="stock_picking_return_line_inherit" model="ir.ui.view">
             <field name="name">Stock Return Move Line Inherit</field>
             <field name="model">stock.return.picking</field>
@@ -68,7 +67,6 @@
             </field>
         </record>
 
-        <!-- Inherit Form View to Modify it -->
         <record id="scrap_form_inherit" model="ir.ui.view">
             <field name="name">Scrap Form Inherit</field>
             <field name="model">stock.scrap</field>

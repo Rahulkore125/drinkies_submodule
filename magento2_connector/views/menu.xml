@@ -13,7 +13,5 @@
 
     <menuitem id="magento_products" name="Products" parent="magento_odoo_connector_root" sequence="4"/>
 
-    <menuitem id="magento_invoice" name="Invoice" parent="magento_odoo_connector_root" sequence="5"/>
-
     <menuitem id="magento_config" name="Configuration" parent="magento_odoo_connector_root" sequence="6"/>
 </odoo>

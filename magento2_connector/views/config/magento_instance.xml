@@ -21,20 +21,12 @@
         <field name="arch" type="xml">
             <form string="Magengo" class="o_sale_order" duplicate="0">
                 <header>
-                    <button name="fetch_product_attribute" type="object" string="Fetch Product Attribute"
-                            class="btn-primary" sequence="1"/>
                     <button name="fetch_products" type="object" string="Fetch Products" class="btn-primary"
                             sequence="2"/>
-<!--                    <button name="fetch_invoice" type="object" string="Fetch Invoice" class="btn-primary" sequence="3"/>-->
-<!--                    <button name="fetch_tax" type="object" string="Fetch Tax" class="btn-primary" sequence="4"/>-->
                     <button name="fetch_customers" type="object" string="Fetch Customers" class="btn-primary"
                             sequence="5"/>
                     <button name="fetch_sale_orders" type="object" string="Fetch Sale Orders" class="btn-primary"
                             sequence="6"/>
-<!--                    <button name="fetch_shipments" type="object" string="Fetch Shipments" class="btn-primary"-->
-<!--                            sequence="7"/>-->
-                    <button name="fetch_order_update" type="object" string="Fetch Orders Update" class="btn-primary"
-                            sequence="8"/>
                     <button name="fetch_source" type="object" string="Fetch Sources" class="btn-primary"
                             sequence="8"/>
                 </header>
@@ -55,21 +47,6 @@
                             <field name="company_id"/>
                         </group>
                     </group>
-<!--                    <hr class="mt4 mb4"/>-->
-<!--                    <div class="oe_title">-->
-<!--                        <h1>-->
-<!--                            Invoicing-->
-<!--                        </h1>-->
-<!--                        <group>-->
-<!--                            <group>-->
-<!--                                <field name="journal_id"/>-->
-<!--                                <field name="payment_journal"/>-->
-<!--                            </group>-->
-<!--                            <group>-->
-<!--                                <field name="prefix_invoice"/>-->
-<!--                            </group>-->
-<!--                        </group>-->
-<!--                    </div>-->
 
                     <hr class="mt4 mb4"/>
                     <div class="oe_title">
@@ -82,53 +59,6 @@
                             </group>
                         </group>
                     </div>
-                    <hr class="mt4 mb4"/>
-                    <div class="oe_title">
-                        <h1>
-                            Fetch data
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="customers_pageSize"/>
-                            <field name="products_pageSize"/>
-                        </group>
-                        <group>
-                            <field name="sale_orders_pageSize"/>
-                            <field name="invoice_pageSize"/>
-                        </group>
-                    </group>
-                    <hr class="mt4 mb4"/>
-                    <div class="oe_title">
-                        <h1>
-                            Auto Fetch
-                        </h1>
-                    </div>
-                    <h4>Config Cron</h4>
-                    <div attrs="{'invisible' : [('auto_import_magento', '=', False)]}">
-                        <span>This config will be set schedule action for automatic fetch data from magento, should be
-                            set time to execute every at least 5 minutes for best process.
-                        </span>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="auto_import_magento" string="Import Automatic"/>
-                            <field name="nextcall_import_magento"
-                                   attrs="{'invisible' : [('auto_import_magento', '=', False)],'required': [('auto_import_magento', '=', True)]}"/>
-                        </group>
-                        <group>
-                            <label for="interval_number_import_magento" string="Execute every"
-                                   attrs="{'invisible' : [('auto_import_magento','=', False)]}"/>
-                            <div class="o_row o_row_readonly"
-                                 attrs="{'invisible' : [('auto_import_magento','=', False)], 'required': [('auto_import_magento', '=', True)]}">
-                                <field name="interval_number_import_magento"/>
-                                <span class="oe_inline">
-                                    -
-                                </span>
-                                <field name="interval_type_import_magento"/>
-                            </div>
-                        </group>
-                    </group>
                 </sheet>
             </form>
         </field>

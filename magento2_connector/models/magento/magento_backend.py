@@ -1,7 +1,8 @@
 import datetime
-from datetime import date, datetime
 import sys
 import traceback
+from datetime import date, datetime
+
 import math
 
 from odoo import models, fields, api
@@ -756,7 +757,6 @@ class MagentoBackend(models.Model):
                     'default_message': "Sources are fetching by schedule action, you can fetch sale orders manually after schedule action finish"
                 },
             }
-
 
     @api.multi
     def auto_fetch_magento_data(self):

@@ -305,18 +305,18 @@ class Product(Client):
                                         'is_heineken_product': True
                                     })
                                 magento_product_product.append((external_product_id, backend_id))
-                if odoo_product_template and len(odoo_product_template) > 0:
-                    product_template_ids = context.env['product.template'].create(odoo_product_template)
-                    product_product_ids = []
-                    for product_tmpl_id in product_template_ids:
-                        if len(product_tmpl_id.product_variant_ids) > 0:
-                            product_product_ids.append(product_tmpl_id.product_variant_ids[0].id)
-                    if len(product_product_ids) == len(magento_product_product):
-                        context.env.cr.execute(
-                            """INSERT INTO magento_product_product(odoo_id, external_id, backend_id) VALUES {values}""".
-                                format(values=", ".join(["%s"] * len(product_product_ids))),
-                            tuple(map(lambda x, y: (x,) + y, product_product_ids, magento_product_product)))
-                    else:
-                        raise UserError("Error,Please try again!")
+            if odoo_product_template and len(odoo_product_template) > 0:
+                product_template_ids = context.env['product.template'].create(odoo_product_template)
+                product_product_ids = []
+                for product_tmpl_id in product_template_ids:
+                    if len(product_tmpl_id.product_variant_ids) > 0:
+                        product_product_ids.append(product_tmpl_id.product_variant_ids[0].id)
+                if len(product_product_ids) == len(magento_product_product):
+                    context.env.cr.execute(
+                        """INSERT INTO magento_product_product(odoo_id, external_id, backend_id) VALUES {values}""".
+                            format(values=", ".join(["%s"] * len(product_product_ids))),
+                        tuple(map(lambda x, y: (x,) + y, product_product_ids, magento_product_product)))
+                else:
+                    raise UserError("Error,Please try again!")
 
         return 0

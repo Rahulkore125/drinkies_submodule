@@ -57,6 +57,7 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="team_id" required="1"/>
+                    <field name="user_id"/>
                     <field name="estimate_discount_total"/>
                     <field name="payment_method"/>
                 </xpath>

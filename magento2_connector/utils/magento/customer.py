@@ -11,6 +11,7 @@ def get_state_id(country_id, region, region_code, context=None):
     if context is not None:
         state_id = context.env['res.country.state'].search(
             [('country_id', '=', country_id), ('code', '=', region_code), ('name', '=', region)], limit=1)
+
         return state_id.id
     return None
 
@@ -30,7 +31,7 @@ class Customer(Client):
 
     def list_gt_updated_at(self, updated_at):
         return self.call('rest/V1/customers/search',
-                         'searchCriteria[filter_groups][0][filters][0][field]=updated_at&searchCriteria[filter_groups][0][filters][0][value]=' + str(
+                             'searchCriteria[filter_groups][0][filters][0][field]=updated_at&searchCriteria[filter_groups][0][filters][0][value]=' + str(
                              updated_at) + '&searchCriteria[filter_groups][0][filters][0][condition_type]=gteq')
 
     def insert(self, customers, backend_id, url, token, context=None):
@@ -74,21 +75,7 @@ class Customer(Client):
                     'email': email,
                     'group_id': group_id
                 })
-                # xoa tat ca cac partner co email bi trung con lai
-                # for email_existed in rec_email_existed:
-                #     old_partner_child = context.env['res.partner'].search(
-                #         [('id', '!=', email_existed.odoo_id.id), ('email', '=', email), ('active', '=', True)])
-                #     for partner in old_partner_child:
-                #         # cap nhat sale order co lien quan, dinh vs partner o tren
-                #         # sale_orders = context.env['magento.sale.order'].search([('partner_id', '=', partner.id)])
-                #         # for order in sale_orders:
-                #         #     order.update({
-                #         #         'partner_id': old_partner_parent.id
-                #         #     })
-                #         partner.update({
-                #             'active': False
-                #         })
-                # update new address if new customer have address
+
                 if customer['addresses'] and len(customer['addresses']) > 0:
                     # first address
                     new_address = customer['addresses'][0]

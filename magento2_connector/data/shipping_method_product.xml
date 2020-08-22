@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <odoo>
-    <data>
+    <data noupdate="1">
         <record id="magento_flat_rate_shipping_product" model="product.product">
             <field name="name">Flat Rate</field>
             <field name="standard_price">5</field>

@@ -1,78 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--<data noupdate="0">-->
-    <record id="flat_rate_shipping_method" model="delivery.carrier">
-        <field name="name">Flat Rate Shipping Method</field>
-        <field name="intergration_level">rate and ship</field>
-        <field name="active">True</field>
-        <field name="default_code">Flat Rate Shipping Method</field>
-        <field name="fixed_price">5</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="product_id" ref="magento2_connector.magento_flat_rate_shipping_product"/>
-    </record>
-    <record id="free_shipping_method" model="delivery.carrier">
-        <field name="name">Free Shipping Method</field>
-        <field name="intergration_level">Rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">0</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">Free Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_free_shipping_product"/>
-    </record>
-    <record id="table_rates_shipping_method" model="delivery.carrier">
-        <field name="name">Table Rates Shipping Method</field>
-        <field name="intergration_level">rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">5</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">Table Rates Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_table_rates_shipping_product"/>
-    </record>
-    <record id="ups_shipping_method" model="delivery.carrier">
-        <field name="name">UPS Shipping Method</field>
-        <field name="intergration_level">Rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">5</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">UPS Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_ups_shipping_product"/>
-    </record>
-    <record id="usps_shipping_method" model="delivery.carrier">
-        <field name="name">USPS Shipping Method</field>
-        <field name="intergration_level">Rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">5</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">USPS Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_usps_shipping_product"/>
-    </record>
-    <record id="fedex_shipping_method" model="delivery.carrier">
-        <field name="name">Fedex Shipping Method</field>
-        <field name="intergration_level">Rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">10</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">Fedex Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_fedex_shipping_product"/>
-    </record>
-    <record id="dhl_shipping_method" model="delivery.carrier">
-        <field name="name">DHL Shipping Method</field>
-        <field name="intergration_level">rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">10</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">DHL Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_dhl_shipping_product"/>
-    </record>
+    <data noupdate="1">
+        <record id="flat_rate_shipping_method" model="delivery.carrier">
+            <field name="name">Flat Rate Shipping Method</field>
+            <field name="intergration_level">rate and ship</field>
+            <field name="active">True</field>
+            <field name="default_code">Flat Rate Shipping Method</field>
+            <field name="fixed_price">5</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="product_id" ref="magento2_connector.magento_flat_rate_shipping_product"/>
+        </record>
+        <record id="free_shipping_method" model="delivery.carrier">
+            <field name="name">Free Shipping Method</field>
+            <field name="intergration_level">Rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">0</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">Free Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_free_shipping_product"/>
+        </record>
+        <record id="table_rates_shipping_method" model="delivery.carrier">
+            <field name="name">Table Rates Shipping Method</field>
+            <field name="intergration_level">rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">5</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">Table Rates Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_table_rates_shipping_product"/>
+        </record>
+        <record id="ups_shipping_method" model="delivery.carrier">
+            <field name="name">UPS Shipping Method</field>
+            <field name="intergration_level">Rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">5</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">UPS Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_ups_shipping_product"/>
+        </record>
+        <record id="usps_shipping_method" model="delivery.carrier">
+            <field name="name">USPS Shipping Method</field>
+            <field name="intergration_level">Rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">5</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">USPS Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_usps_shipping_product"/>
+        </record>
+        <record id="fedex_shipping_method" model="delivery.carrier">
+            <field name="name">Fedex Shipping Method</field>
+            <field name="intergration_level">Rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">10</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">Fedex Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_fedex_shipping_product"/>
+        </record>
+        <record id="dhl_shipping_method" model="delivery.carrier">
+            <field name="name">DHL Shipping Method</field>
+            <field name="intergration_level">rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">10</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">DHL Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_dhl_shipping_product"/>
+        </record>
 
-    <record id="getswift_shipping_method" model="delivery.carrier">
-        <field name="name">GetSwift Shipping Method</field>
-        <field name="intergration_level">rate and ship</field>
-        <field name="active">True</field>
-        <field name="fixed_price">0</field>
-        <field name="taxes_id" eval="[(6, 0, [])]"/>
-        <field name="default_code">GetSwift Shipping Method</field>
-        <field name="product_id" ref="magento2_connector.magento_getswift_shipping_product"/>
-    </record>
-    <!--</data>-->
+        <record id="getswift_shipping_method" model="delivery.carrier">
+            <field name="name">GetSwift Shipping Method</field>
+            <field name="intergration_level">rate and ship</field>
+            <field name="active">True</field>
+            <field name="fixed_price">0</field>
+            <field name="taxes_id" eval="[(6, 0, [])]"/>
+            <field name="default_code">GetSwift Shipping Method</field>
+            <field name="product_id" ref="magento2_connector.magento_getswift_shipping_product"/>
+        </record>
+    </data>
 </odoo>

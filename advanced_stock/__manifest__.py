@@ -28,7 +28,8 @@
         'views/product_product_view.xml',
         'views/product_template_view.xml',
         'views/stock_inventory_view.xml',
-        'views/stock_picking_view.xml'
+        'views/stock_picking_view.xml',
+        'views/stock_location_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

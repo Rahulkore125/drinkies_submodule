@@ -177,3 +177,9 @@ class StockMove(models.Model):
         for rec in self:
             if rec.product_uom.factor_inv:
                 rec.unit_real_qty = rec.product_uom_qty * rec.product_uom.factor_inv
+
+
+class StockLocation(models.Model):
+    _inherit = 'stock.location'
+
+    in_report = fields.Boolean("Is in Report?")

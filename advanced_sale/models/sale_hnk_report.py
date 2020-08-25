@@ -17,7 +17,7 @@ class SaleHnkReport(models.Model):
     report_line_ids = fields.One2many(comodel_name='sale.hnk.report.line', inverse_name='sale_report_id',
                                       string="Report Line")
     datetime_report = fields.Datetime(string="Datetime Report")
-    location_id = fields.Many2one('stock.location', domain="[('is_from_magento', '=', True)]")
+    location_id = fields.Many2one('stock.location', domain="[('in_report', '=', True)]")
 
     def generate_report(self):
         a = self.env.user.tz_offset

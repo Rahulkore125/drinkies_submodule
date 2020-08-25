@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <data>
+    <data noupdate="1">
         <record id="create_customer_guest" model="res.partner">
             <field name="name">create.customer.guest</field>
             <field name="user_id" ref="base.user_root"/>

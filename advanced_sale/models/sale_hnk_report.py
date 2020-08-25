@@ -66,11 +66,11 @@ class SaleHnkReport(models.Model):
                                   day=today_date.day, hour=24 - time_offset, minute=00, second=00)
         if not self.location_id:
             sale_orders = self.env['sale.order'].search(
-                [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date),
+                [('delivery_date', '>=', start_order_date), ('delivery_date', '<', end_order_date),
                  ('state', '=', 'done')])
         else:
             sale_orders = self.env['sale.order'].search(
-                [('delivery_date', '>', start_order_date), ('delivery_date', '<', end_order_date),
+                [('delivery_date', '>=', start_order_date), ('delivery_date', '<', end_order_date),
                  ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
 
         heineken_product = self.env['product.product'].search([('is_heineken_product', '=', True)])
@@ -247,11 +247,11 @@ class SaleHnkReport(models.Model):
         # handle asc delivery
         if not self.location_id:
             asc_deliveries = self.env['stock.picking'].search(
-                [('date_done', '>', start_order_date), ('date_done', '<', end_order_date),
+                [('date_done', '>=', start_order_date), ('date_done', '<', end_order_date),
                  ('state', '=', 'done'), ('is_return_picking', '=', False), ('picking_type_id.code', '=', 'incoming')])
         else:
             asc_deliveries = self.env['stock.picking'].search(
-                [('date_done', '>', start_order_date), ('date_done', '<', end_order_date),
+                [('date_done', '>=', start_order_date), ('date_done', '<', end_order_date),
                  ('state', '=', 'done'), ('location_dest_id', '=', self.location_id.id),
                  ('is_return_picking', '=', False), ('picking_type_id.code', '=', 'incoming')])
 

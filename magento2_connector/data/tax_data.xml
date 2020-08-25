@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <data noupdate="1">
         <record id="tax_100" model="account.tax">
             <field name="name">Tax 100%</field>
             <field name="amount">100</field>

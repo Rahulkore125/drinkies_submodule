@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
 
     currency_id = fields.Many2one('res.currency', readonly=True,
                                   default=lambda self: self.env.user.company_id.currency_id)
-    location_id = fields.Many2one('stock.location', string="Location", domain=[('is_from_magento', '=', True)])
+    location_id = fields.Many2one('stock.location', string="Location", domain=[('is_from_magento', '=', True)], track_visibility='onchange')
 
     # owner location can see own SO, invoice
     user_related = fields.Many2one(string="Owner location", comodel_name="res.users", compute="compute_user_related",

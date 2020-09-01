@@ -162,7 +162,7 @@ class SaleHnkReport(models.Model):
                 if sale_order_line.product_id.id in product_ids:
                     if not sale_order_line.is_reward_line and not sale_order_line.is_delivery and not sale_order_line.product_id.is_discount_product:
                         # handle amount and quantity
-                        discount = sale_order.computed_discount_total * sale_order_line.price_subtotal / sale_order.amount_untaxed
+                        discount = sale_order.computed_discount_total * sale_order_line.price_subtotal / sale_order.amount_untaxed if sale_order.amount_untaxed != 0 else 0
                         if sale_order.team_id.id == sale:
                             product_ids[sale_order_line.product_id.id][
                                 'sum_sale_chanel'] += sale_order_line.product_uom_qty
@@ -230,15 +230,47 @@ class SaleHnkReport(models.Model):
                             'amount_discount'] += discount
 
         # handle scrap
-        scrap = self.env['stock.scrap'].search(
-            [('date_scrap', '=', self.date_report), ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
+        if self.location_id.id:
+            if self.compute_at_date == 0:
+                scrap = self.env['stock.scrap'].search(
+                    [('date_scrap', '=', self.date_report), ('state', '=', 'done'),
+                     ('location_id', '=', self.location_id.id)])
+            elif self.compute_at_date == 1:
+                scrap = self.env['stock.scrap'].search(
+                    [('date_scrap', '>=', self.from_date_report), ('date_scrap', '<=', self.to_date_report),
+                     ('state', '=', 'done'),
+                     ('location_id', '=', self.location_id.id)])
+        else:
+            if self.compute_at_date == 0:
+                scrap = self.env['stock.scrap'].search(
+                    [('date_scrap', '=', self.date_report), ('state', '=', 'done')])
+            elif self.compute_at_date == 1:
+                scrap = self.env['stock.scrap'].search(
+                    [('date_scrap', '>=', self.from_date_report), ('date_scrap', '<=', self.to_date_report),
+                     ('state', '=', 'done')])
         for e in scrap:
             product_ids[e.product_id.id]['damaged'] += e.scrap_qty
 
         # handle return
-        return_picking = self.env['stock.picking'].search(
-            [('date_return', '=', self.date_report), ('is_return_picking', '=', True), ('state', '=', 'done'),
-             ('location_dest_id', '=', self.location_id.id)])
+        if self.location_id.id:
+            if self.compute_at_date == 0:
+                return_picking = self.env['stock.picking'].search(
+                    [('date_return', '=', self.date_report), ('is_return_picking', '=', True), ('state', '=', 'done'),
+                     ('location_dest_id', '=', self.location_id.id)])
+            elif self.compute_at_date == 1:
+                return_picking = self.env['stock.picking'].search(
+                    [('date_return', '<=', self.to_date_report), ('date_return', '>=', self.from_date_report),
+                     ('is_return_picking', '=', True), ('state', '=', 'done'),
+                     ('location_dest_id', '=', self.location_id.id)])
+        else:
+            if self.compute_at_date == 0:
+                return_picking = self.env['stock.picking'].search(
+                    [('date_return', '=', self.date_report), ('is_return_picking', '=', True), ('state', '=', 'done')])
+            elif self.compute_at_date == 1:
+                return_picking = self.env['stock.picking'].search(
+                    [('date_return', '<=', self.to_date_report), ('date_return', '>=', self.from_date_report),
+                     ('is_return_picking', '=', True), ('state', '=', 'done')])
+
         for e in return_picking:
             for f in e.move_ids_without_package:
                 if not f.scrapped:

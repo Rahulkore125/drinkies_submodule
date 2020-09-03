@@ -103,7 +103,7 @@
                     <label for="location_id"/>
                     <div name="location_selection">
                         <field name="location_id" required="1" options='{"no_create": True}'
-                               domain="[('magento_source_code','!=','default')]"/>
+                               domain="[('in_report','=',True)]"/>
                     </div>
                     <label for="user_related" groups="base.group_system"/>
                     <div name="user_related_selection" groups="base.group_system">

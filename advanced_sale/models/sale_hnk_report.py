@@ -243,11 +243,11 @@ class SaleHnkReport(models.Model):
         else:
             if self.compute_at_date == 0:
                 scrap = self.env['stock.scrap'].search(
-                    [('date_scrap', '=', self.date_report), ('state', '=', 'done')])
+                    [('date_scrap', '=', self.date_report), ('state', '=', 'done'), ('location_id.in_report', '=', True)])
             elif self.compute_at_date == 1:
                 scrap = self.env['stock.scrap'].search(
                     [('date_scrap', '>=', self.from_date_report), ('date_scrap', '<=', self.to_date_report),
-                     ('state', '=', 'done')])
+                     ('state', '=', 'done'), ('location_id.in_report', '=', True)])
         for e in scrap:
             product_ids[e.product_id.id]['damaged'] += e.scrap_qty
 

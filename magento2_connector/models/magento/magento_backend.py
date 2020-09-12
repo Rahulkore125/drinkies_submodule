@@ -430,7 +430,7 @@ class MagentoBackend(models.Model):
                     sync_date = pull_history.sync_date
                     time_pull = datetime(sync_date.year, month=sync_date.month,
                                          day=sync_date.day, hour=00, minute=00, second=00)
-                    orders_pull = order.list_gt_created_at_after_sync(time_pull)
+                    orders_pull = order.list_order_updated_at_after_sync(time_pull)
 
                     if len(orders_pull['items']) > 0:
                         for e in orders_pull['items']:

@@ -10,7 +10,7 @@ class ProductTemplate(models.Model):
                                                    store=True)
     variant_manage_stock = fields.Many2one('product.product', domain="[('product_tmpl_id', '=', id)]",
                                            string="Variant Manage Stock")
-    is_heineken_product = fields.Boolean("Is Heineken Product", default=False)
+    is_heineken_product = fields.Boolean("Is Drinkies Product", default=False)
     origin_quantity = fields.Float(string="Origin Quantity", default=0)
     fetching = fields.Boolean("Fetching", default=False)
 

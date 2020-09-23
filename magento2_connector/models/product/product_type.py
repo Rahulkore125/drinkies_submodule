@@ -51,6 +51,7 @@ class ProductType(models.Model):
                             link = url + '/media/catalog/product' + file
                             try:
                                 if link:
+                                    print(link)
                                     req = Request(link, headers={'User-Agent': 'Mozilla/5.0'})
                                     profile_image = base64.encodebytes(urlopen(req).read())
                                     val = {

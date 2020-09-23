@@ -28,7 +28,7 @@
                     <field name="team_id"/>
                     <field name="payment_method"/>
                     <field name="is_heineken_product"/>
-                    <filter string="Heineken Product" name="is_heineken_product"
+                    <filter string="Drinkies Product" name="is_heineken_product"
                             domain="[('is_heineken_product','=', True)]"/>
                     <group expand="0" string="Group By">
                         <filter string="Product" name="product_id" context="{'group_by': 'product_id'}"/>

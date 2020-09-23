@@ -15,5 +15,5 @@ class SaleAndStockReport(models.Model):
     payment_method = fields.Selection([('cod', 'COD'), ('online_payment', 'Online payment')], string="Payment method")
     sold = fields.Float(string='Sold')
     amount = fields.Monetary(string='Amount', currency_field="company_currency_id")
-    is_heineken_product = fields.Boolean(string="Is Heineken Product", related='product_id.is_heineken_product',
+    is_heineken_product = fields.Boolean(string="Is Drinkies Product", related='product_id.is_heineken_product',
                                          store=True)

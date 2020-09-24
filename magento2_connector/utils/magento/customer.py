@@ -92,7 +92,7 @@ class Customer(Client):
                         new_postcode = new_address['postcode']
                     else:
                         new_postcode = ""
-                    new_city = new_address['city']
+                    new_city = get_city_name(new_address['city'], context)
                     new_country_id = get_country_id(new_address['country_id'], context)
                     new_state_id = False
                     if new_country_id:
@@ -144,7 +144,7 @@ class Customer(Client):
                             first_postcode = first_address['postcode']
                         else:
                             first_postcode = ""
-                        first_city = first_address['city']
+                        first_city = get_city_name(first_address['city'], context)
                         first_country_id = get_country_id(first_address['country_id'], context)
                         first_state_id = False
                         if first_country_id:
@@ -176,7 +176,7 @@ class Customer(Client):
                     postcode = address['postcode']
                 else:
                     postcode = ""
-                city = address['city']
+                city = get_city_name(address['city'], context)
                 country_id = get_country_id(address['country_id'], context)
                 state_id = None
                 if country_id:

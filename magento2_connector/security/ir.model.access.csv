@@ -16,4 +16,5 @@ access_magento_product_category,Magento product category,model_magento_product_c
 access_magento_product_attribute,Magento product attribute,model_magento_product_attribute,,1,1,1,1
 access_magento_account_invoice,Magento invoice,model_magento_account_invoice,,1,1,1,1
 access_magento_source,Magento source,model_magento_source,,1,1,1,1
+access_magento_city,Magento city,model_magento_city,,1,1,1,1
 access_trace_back_information,Magento source,model_trace_back_information,base.group_system,1,1,1,1

@@ -9,6 +9,9 @@
     <menuitem id="magento_customer_and_sale" name="Customers &amp; Sales" parent="magento_odoo_connector_root"
               sequence="2"/>
 
+    <!-- This Menu Item must have a parent and an action -->
+    <menuitem id="magento_city" name="Magento City" parent="magento_customer_and_sale" action="magento_city_action" sequence="1"/>
+
     <menuitem id="magento_categories" name="Categories" parent="magento_odoo_connector_root" sequence="3"/>
 
     <menuitem id="magento_products" name="Products" parent="magento_odoo_connector_root" sequence="4"/>

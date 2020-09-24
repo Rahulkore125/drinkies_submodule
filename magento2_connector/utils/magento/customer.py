@@ -16,6 +16,13 @@ def get_state_id(country_id, region, region_code, context=None):
     return None
 
 
+def get_city_name(magento_city_id, context=None):
+    if magento_city_id:
+        city = context.env['magento.city'].search([('external_id', '=', magento_city_id)])
+        return city.name
+    else:
+        return None
+
 class Customer(Client):
     __slots__ = ()
 
@@ -31,7 +38,7 @@ class Customer(Client):
 
     def list_gt_updated_at(self, updated_at):
         return self.call('rest/V1/customers/search',
-                             'searchCriteria[filter_groups][0][filters][0][field]=updated_at&searchCriteria[filter_groups][0][filters][0][value]=' + str(
+                         'searchCriteria[filter_groups][0][filters][0][field]=updated_at&searchCriteria[filter_groups][0][filters][0][value]=' + str(
                              updated_at) + '&searchCriteria[filter_groups][0][filters][0][condition_type]=gteq')
 
     def insert(self, customers, backend_id, url, token, context=None):

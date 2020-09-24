@@ -15,5 +15,23 @@
                </xpath>
            </field>
        </record>
+
+        <record id="magento_city_action" model="ir.actions.act_window">
+            <field name="name">magento city</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">magento.city</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="magento_city_tree" model="ir.ui.view">
+            <field name="name">magento city tree</field>
+            <field name="model">magento.city</field>
+            <field name="arch" type="xml">
+                <tree string="Magento City">
+                    <field name="name"/>
+                    <field name="external_id"/>
+                </tree>
+            </field>
+        </record>
     </data>
 </odoo>

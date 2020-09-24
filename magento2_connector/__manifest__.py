@@ -24,7 +24,6 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/menu.xml',
         'views/sale/sale_views.xml',
         'views/product/product.xml',
         'views/product/categories.xml',
@@ -40,6 +39,7 @@
         'views/dashboard/storeview.xml',
         'views/dashboard/dashboard_view.xml',
         'views/dashboard/traceback.xml',
+        'views/menu.xml',
 
         # data
         'data/customer_guest.xml',

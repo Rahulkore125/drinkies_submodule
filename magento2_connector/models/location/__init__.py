@@ -1,2 +1,3 @@
 from . import magento_source
 from . import stock_location
+from . import magento_city

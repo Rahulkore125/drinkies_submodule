@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from .customer import get_state_id, get_country_id
+from .customer import get_state_id, get_country_id, get_city_name
 from ..magento.rest import Client
 
 
@@ -313,11 +313,12 @@ class Order(Client):
                                                                  shipping_address['region_code'],
                                                                  context)
                         shipping_address_country_id = get_country_id(shipping_address['country_id'], context)
+                        city = get_city_name(shipping_address['city'], context)
                         new_customer = []
                         shipping_address_data = (
                             shipping_address['firstname'] + " " + shipping_address['lastname'],
                             shipping_address['street'][0],
-                            shipping_address['postcode'], shipping_address['city'], shipping_address_state_id,
+                            shipping_address['postcode'], city, shipping_address_state_id,
                             shipping_address_country_id, shipping_address['email'],
                             shipping_address['telephone'],
                             True,

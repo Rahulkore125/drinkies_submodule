@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 from odoo.exceptions import UserError
-from odoo.http import request
 from ..magento.rest import Client
 
 
@@ -193,7 +192,7 @@ class Product(Client):
         if len(products) > 0:
             for product in products:
                 if 'id' in product:
-                    product_exist = request.env['magento.product.product'].search([('external_id', '=', product['id'])])
+                    product_exist = context.env['magento.product.product'].search([('external_id', '=', product['id'])])
                     # kiem tra product nay da duoc pull ve hay chua
                     if not len(product_exist) > 0:
                         extension_attributes = product['extension_attributes']

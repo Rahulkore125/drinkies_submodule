@@ -249,7 +249,8 @@ class SaleHnkReport(models.Model):
                     [('date_scrap', '>=', self.from_date_report), ('date_scrap', '<=', self.to_date_report),
                      ('state', '=', 'done'), ('location_id.in_report', '=', True)])
         for e in scrap:
-            product_ids[e.product_id.id]['damaged'] += e.scrap_qty
+            if e.product_id.id in product_ids:
+                product_ids[e.product_id.id]['damaged'] += e.scrap_qty
 
         # handle return
         if self.location_id.id:
@@ -273,7 +274,7 @@ class SaleHnkReport(models.Model):
 
         for e in return_picking:
             for f in e.move_ids_without_package:
-                if not f.scrapped:
+                if not f.scrapped and f.product_id.id in product_ids:
                     product_ids[f.product_id.id]['returned'] += f.product_uom_qty
 
         # handle asc delivery
@@ -297,7 +298,8 @@ class SaleHnkReport(models.Model):
                         delivery_quantity[delivery_line.product_id.id] = delivery_line.quantity_done
 
         for e in delivery_quantity:
-            product_ids[e]['asc_delivery'] = delivery_quantity[e]
+            if e in product_ids:
+                product_ids[e]['asc_delivery'] = delivery_quantity[e]
 
         self.env['sale.hnk.report.line'].search([]).unlink()
 

@@ -627,6 +627,21 @@ class MagentoBackend(models.Model):
 
                                 picking = self.env['stock.picking'].search([('id', '=', new_picking_id)])
 
+                                multiple_sku_tmpl = {}
+                                for move_line in picking.move_line_ids_without_package:
+                                    if move_line.product_id.product_tmpl_id.multiple_sku_one_stock:
+                                        if move_line.product_id.product_tmpl_id.id in multiple_sku_tmpl:
+                                            multiple_sku_tmpl[move_line.product_id.product_tmpl_id.id] = \
+                                                multiple_sku_tmpl[
+                                                    move_line.product_id.product_tmpl_id.id] + move_line.product_uom_qty * move_line.product_id.deduct_amount_parent_product
+                                        else:
+                                            variant_manage_stock = move_line.product_id.product_tmpl_id.variant_manage_stock
+                                            original_quantity = self.env['stock.quant'].search(
+                                                [('location_id', '=', picking.location_dest_id.id),
+                                                 ('product_id', '=', variant_manage_stock.id)])
+                                            multiple_sku_tmpl[
+                                                move_line.product_id.product_tmpl_id.id] = original_quantity.quantity * variant_manage_stock.deduct_amount_parent_product + move_line.product_uom_qty * move_line.product_id.deduct_amount_parent_product
+
                                 if 'order_source_code' in e['extension_attributes']:
                                     source = self.env['stock.location'].search(
                                         [('magento_source_code', '=',
@@ -649,10 +664,21 @@ class MagentoBackend(models.Model):
                                 origin_picking = self.env['stock.picking'].search(
                                     [('id', '=', stock_picking.id)])
                                 origin_picking.has_return_picking = True
-                                ## after action_done(), sync stock to magento
-                                stock2magento = self.env['stock.to.magento']
+
                                 magento_backend = self.env['magento.backend'].search([], limit=1)
                                 client = Client(magento_backend.web_url, magento_backend.access_token, True)
+
+                                #update quantity multiple keg
+                                if len(multiple_sku_tmpl) > 0:
+                                    stock2magento = self.env['stock.to.magento']
+                                    stock2magento.force_update_inventory_special_keg(
+                                        location_id=picking.location_dest_id,
+                                        location_dest_id=False,
+                                        multiple_sku_tmpl=multiple_sku_tmpl, client=client,
+                                        type='incoming')
+
+                                ## after action_done(), sync stock to magento
+                                stock2magento = self.env['stock.to.magento']
                                 for line in picking.move_line_ids:
                                     stock2magento.sync_quantity_to_magento(location_id=picking.location_dest_id,
                                                                            product_id=line.product_id, client=client)

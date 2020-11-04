@@ -7,24 +7,24 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     def auto_install(self):
-        # self.env.cr.execute("DELETE FROM account_invoice")
-        # self.env.cr.execute("DELETE FROM account_invoice_line");
-        # self.env.cr.execute("DELETE FROM account_invoice_line");
-        # self.env.cr.execute("DELETE FROM stock_change_product_qty");
-        #
-        # self.env.cr.execute("DELETE FROM sale_order")
-        # self.env.cr.execute("DELETE from account_payment")
-        #
-        # self.env.cr.execute("DELETE from account_partial_reconcile")
-        # self.env.cr.execute("DELETE from account_move")
-        # self.env.cr.execute("DELETE from account_move_line")
-        # self.env.cr.execute("DELETE from stock_inventory")
-        # self.env.cr.execute("DELETE from stock_picking")
-        # self.env.cr.execute("DELETE from stock_scrap")
-        # self.env.cr.execute("DELETE from stock_return_picking")
-        # self.env.cr.execute("DELETE from stock_return_picking_line")
-        # self.env.cr.execute("DELETE from stock_move")
-        # self.env.cr.execute("DELETE from stock_quant")
+        self.env.cr.execute("DELETE FROM account_invoice")
+        self.env.cr.execute("DELETE FROM account_invoice_line");
+        self.env.cr.execute("DELETE FROM account_invoice_line");
+        self.env.cr.execute("DELETE FROM stock_change_product_qty");
+
+        self.env.cr.execute("DELETE FROM sale_order")
+        self.env.cr.execute("DELETE from account_payment")
+
+        self.env.cr.execute("DELETE from account_partial_reconcile")
+        self.env.cr.execute("DELETE from account_move")
+        self.env.cr.execute("DELETE from account_move_line")
+        self.env.cr.execute("DELETE from stock_inventory")
+        self.env.cr.execute("DELETE from stock_picking")
+        self.env.cr.execute("DELETE from stock_scrap")
+        self.env.cr.execute("DELETE from stock_return_picking")
+        self.env.cr.execute("DELETE from stock_return_picking_line")
+        self.env.cr.execute("DELETE from stock_move")
+        self.env.cr.execute("DELETE from stock_quant")
 
         # self.env.cr.execute("UPDATE magento_backend SET auto_fetching = False")
         # self.env.cr.execute("UPDATE magento_pull_history set sync_date = '2020-1-5 00:00:04.347442' WHERE name='sale_orders'")
@@ -42,11 +42,11 @@ class SaleOrder(models.Model):
         #
         #
 
-        res_partner = self.env['res.partner'].search([])
-        for e in res_partner:
-            city = self.env['magento.city'].search([('external_id', '=', e.city)], limit=1)
-            if len(city) > 0:
-                e.city = city.name
+        # res_partner = self.env['res.partner'].search([])
+        # for e in res_partner:
+        #     city = self.env['magento.city'].search([('external_id', '=', e.city)], limit=1)
+        #     if len(city) > 0:
+        #         e.city = city.name
 
         # self.env.cr.execute("UPDATE magento_product_product SET odoo_id = 107 WHERE external_id = 244")
         # self.env.cr.execute("UPDATE magento_product_product SET odoo_id = 108 WHERE external_id = 245")

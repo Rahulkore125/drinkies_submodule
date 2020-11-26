@@ -4,6 +4,7 @@ from .customer import get_state_id, get_country_id, get_city_name
 from ..magento.rest import Client
 from odoo.http import request
 
+
 class Order(Client):
     """
     Allows to import orders.
@@ -53,30 +54,30 @@ class Order(Client):
             # sale_orders_lines_json = []
             # default_consumer_product_id = 1
             # default_service_product_id = 1
-            #
-            # get guest id???
-            partner_id = context.env.ref('magento2_connector.create_customer_guest').id
-            default_magento_partner_odoo_id = -1
-            default_magento_partner_odoo = context.env['magento.res.partner'].sudo().search(
-                [('backend_id', '=', backend_id), ('odoo_id', '=', partner_id)], limit=1)
-            if not default_magento_partner_odoo:
-                website_list = context.env['magento.website'].sudo().search([('backend_id', '=', backend_id)])
-                for website_item in website_list:
-                    website_store_view = context.env['magento.storeview'].sudo().search(
-                        [('backend_id', '=', backend_id), ('website_id', '=', website_item.id)])
-                    for website_store_view_item in website_store_view:
-                        new_magento_res_partner = context.env['magento.res.partner'].sudo().create({
-                            'backend_id': backend_id,
-                            'odoo_id': partner_id,
-                            'website_id': website_item.id,
-                            'storeview_id': website_store_view_item.id
-                        })
-
-                        default_magento_partner_odoo_id = new_magento_res_partner.id
-            else:
-                default_magento_partner_odoo_id = default_magento_partner_odoo.id
 
             for order in orders:
+                # get guest id???
+                partner_id = context.env.ref('magento2_connector.create_customer_guest').id
+                default_magento_partner_odoo_id = -1
+                default_magento_partner_odoo = context.env['magento.res.partner'].sudo().search(
+                    [('backend_id', '=', backend_id), ('odoo_id', '=', partner_id)], limit=1)
+                if not default_magento_partner_odoo:
+                    website_list = context.env['magento.website'].sudo().search([('backend_id', '=', backend_id)])
+                    for website_item in website_list:
+                        website_store_view = context.env['magento.storeview'].sudo().search(
+                            [('backend_id', '=', backend_id), ('website_id', '=', website_item.id)])
+                        for website_store_view_item in website_store_view:
+                            new_magento_res_partner = context.env['magento.res.partner'].sudo().create({
+                                'backend_id': backend_id,
+                                'odoo_id': partner_id,
+                                'website_id': website_item.id,
+                                'storeview_id': website_store_view_item.id
+                            })
+
+                            default_magento_partner_odoo_id = new_magento_res_partner.id
+                else:
+                    default_magento_partner_odoo_id = default_magento_partner_odoo.id
+
                 name = prefix_order + order['increment_id']
                 # product_id = order['items'][0]['item_id']
                 # magento
@@ -109,8 +110,6 @@ class Order(Client):
                 else:
                     state = 'N/A'
 
-                print(order['state'])
-                print(order['increment_id'])
                 if order['state'] in ['processing', 'shipping', 'complete']:
                     # get shipment_amount and shipment_method
                     shipment_amount = order['extension_attributes']['shipping_assignments'][0]['shipping']['total'][
@@ -152,13 +151,14 @@ class Order(Client):
                             #     pass
                             # else:
                             #     default_code = "'" + default_code + "'"
-                            print(default_code)
-                            magento_product_product = request.env['magento.product.product'].search([('external_id', '=', product_item['product_id'])])
+
+                            magento_product_product = request.env['magento.product.product'].search(
+                                [('external_id', '=', product_item['product_id'])])
                             p_odoo_id = magento_product_product.odoo_id.id
                             context.env.cr.execute('''
                                                                SELECT * FROM combine_id({backend_id},{amount},{p_odoo_id},{external_id})'''.
                                                    format(backend_id=backend_id, amount=tax_percent_fix,
-                                                          p_odoo_id= p_odoo_id,
+                                                          p_odoo_id=p_odoo_id,
                                                           external_id=product_id))
 
                             tmp = context.env.cr.fetchone()
@@ -289,13 +289,12 @@ class Order(Client):
                     elif order['payment']['method'] == 'cashondelivery':
                         payment_method = 'cod'
 
-                    if partner_id == context.env.ref('magento2_connector.create_customer_guest').id:
-                        old_partner = context.env['res.partner'].search(
-                            [('email', '=', order['customer_email']), ('active', '=', True), '|',
-                             ('type', '=', 'contact'),
-                             ('type', '=', False)])
-                        if len(old_partner) > 0:
-                            partner_id = old_partner.ids[0]
+                    old_partner = context.env['res.partner'].search(
+                        [('email', '=', order['customer_email']), ('active', '=', True), '|',
+                         ('type', '=', 'contact'),
+                         ('type', '=', False)])
+                    if len(old_partner) > 0:
+                        partner_id = old_partner.ids[0]
 
                     # add source on sale order
                     if 'order_source_code' in order['extension_attributes']:
@@ -307,11 +306,10 @@ class Order(Client):
                         [('magento_source_code', '=', 'default')], limit=1)
                     system_user = context.env['res.users'].sudo().search([('id', '=', 1)])
 
-
                     # trường hợp address được add trên front end magento, sẽ được cập nhật khi có sale order ship tới địa chỉ này
                     if 'address' in order['extension_attributes']['shipping_assignments'][0][
                         'shipping']:
-                        #get address data
+                        # get address data
                         shipping_address = order['extension_attributes']['shipping_assignments'][0]['shipping'][
                             'address']
                         if not 'region' in shipping_address:

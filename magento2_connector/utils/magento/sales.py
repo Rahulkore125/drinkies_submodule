@@ -2,7 +2,7 @@
 
 from .customer import get_state_id, get_country_id, get_city_name
 from ..magento.rest import Client
-
+from odoo.http import request
 
 class Order(Client):
     """
@@ -110,6 +110,7 @@ class Order(Client):
                     state = 'N/A'
 
                 print(order['state'])
+                print(order['increment_id'])
                 if order['state'] in ['processing', 'shipping', 'complete']:
                     # get shipment_amount and shipment_method
                     shipment_amount = order['extension_attributes']['shipping_assignments'][0]['shipping']['total'][
@@ -145,11 +146,19 @@ class Order(Client):
                                     tax_percent_fix = tax_percent
                             product_id = product_item['product_id']
                             default_code = product_item['sku']
-
-                            context.env.cr.execute("""
-                                                               SELECT * FROM combine_id({backend_id},{amount},'{default_code}',{external_id})""".
+                            # print(default_code.find("'"))
+                            # if default_code.find("'") > 0:
+                            #     default_code = '"' + default_code + '"'
+                            #     pass
+                            # else:
+                            #     default_code = "'" + default_code + "'"
+                            print(default_code)
+                            magento_product_product = request.env['magento.product.product'].search([('external_id', '=', product_item['product_id'])])
+                            p_odoo_id = magento_product_product.odoo_id.id
+                            context.env.cr.execute('''
+                                                               SELECT * FROM combine_id({backend_id},{amount},{p_odoo_id},{external_id})'''.
                                                    format(backend_id=backend_id, amount=tax_percent_fix,
-                                                          default_code=default_code,
+                                                          p_odoo_id= p_odoo_id,
                                                           external_id=product_id))
 
                             tmp = context.env.cr.fetchone()

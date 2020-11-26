@@ -5,8 +5,8 @@ class CRMRoutines(models.Model):
     _name = 'crm.routines'
 
     def init(self):
-        self.env.cr.execute("""
-        CREATE OR REPLACE FUNCTION combine_id(p_backend_id integer, p_amount double precision, p_default_code character varying,
+        self.env.cr.execute('''
+        CREATE OR REPLACE FUNCTION combine_id(p_backend_id integer, p_amount double precision, p_odoo_id integer,
                                       p_product_id integer)
   RETURNS TABLE
           (
@@ -26,7 +26,7 @@ BEGIN
     FROM (
             (SELECT account_tax_id AS account_tax) t1
            LEFT JOIN
-         (SELECT id AS product_product FROM product_product WHERE default_code like p_default_code LIMIT 1) t2
+         (SELECT id AS product_product FROM product_product WHERE id = p_odoo_id) t2
          ON t1.account_tax >= 0
            LEFT JOIN
          (SELECT odoo_id AS magento_product_product
@@ -40,4 +40,4 @@ BEGIN
 END
 $BODY$
   LANGUAGE plpgsql;
-        """)
+        ''')

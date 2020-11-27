@@ -2,7 +2,6 @@
 
 from .customer import get_state_id, get_country_id, get_city_name
 from ..magento.rest import Client
-from odoo.http import request
 
 
 class Order(Client):
@@ -152,7 +151,7 @@ class Order(Client):
                             # else:
                             #     default_code = "'" + default_code + "'"
 
-                            magento_product_product = request.env['magento.product.product'].search(
+                            magento_product_product = context.env['magento.product.product'].sudo().search(
                                 [('external_id', '=', product_item['product_id'])])
                             p_odoo_id = magento_product_product.odoo_id.id
                             context.env.cr.execute('''

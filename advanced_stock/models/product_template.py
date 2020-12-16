@@ -29,7 +29,7 @@ class ProductTemplate(models.Model):
     @api.depends('variant_manage_stock')
     def _compute_product_variant_id(self):
         for p in self:
-            if self.multiple_sku_one_stock:
+            if p.multiple_sku_one_stock:
                 p.product_variant_id = p.variant_manage_stock.id
             else:
                 p.product_variant_id = p.product_variant_ids[:1].id

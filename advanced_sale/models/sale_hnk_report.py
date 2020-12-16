@@ -65,11 +65,11 @@ class SaleHnkReport(models.Model):
         end_order_date = datetime(year=today_date.year, month=today_date.month,
                                   day=today_date.day, hour=24 - time_offset, minute=00, second=00)
         if not self.location_id:
-            sale_orders = self.env['sale.order'].search(
+            sale_orders = self.env['sale.order'].sudo().search(
                 [('delivery_date', '>=', start_order_date), ('delivery_date', '<', end_order_date),
                  ('state', '=', 'done')])
         else:
-            sale_orders = self.env['sale.order'].search(
+            sale_orders = self.env['sale.order'].sudo().search(
                 [('delivery_date', '>=', start_order_date), ('delivery_date', '<', end_order_date),
                  ('state', '=', 'done'), ('location_id', '=', self.location_id.id)])
 

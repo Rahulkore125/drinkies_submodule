@@ -81,10 +81,12 @@ class SaleOrder(models.Model):
             for stock_picking in stock_pickings:
                 for move_line in stock_picking.move_lines:
                     move_line.quantity_done = move_line.product_uom_qty
+                    move_line.reserved_availability = 0
 
                 for move_line_id in stock_picking.move_line_ids:
                     if so.location_id.id:
                         move_line_id.location_id = so.location_id.id
+
                 stock_picking.location_id = so.location_id.id
                 stock_picking.action_done()
                 stock_picking.date_done_delivery = date.today()

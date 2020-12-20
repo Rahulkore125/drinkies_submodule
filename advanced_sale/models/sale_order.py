@@ -86,6 +86,7 @@ class SaleOrder(models.Model):
                 for move_line_id in stock_picking.move_line_ids:
                     if so.location_id.id:
                         move_line_id.location_id = so.location_id.id
+                        move_line_id.product_uom_qty = 0
 
                 stock_picking.location_id = so.location_id.id
                 stock_picking.action_done()

@@ -78,6 +78,7 @@ class Order(Client):
                     default_magento_partner_odoo_id = default_magento_partner_odoo.id
 
                 name = prefix_order + order['increment_id']
+                print(order['increment_id'])
                 # product_id = order['items'][0]['item_id']
                 # magento
                 base_currency_code = order['order_currency_code']

@@ -189,55 +189,56 @@ class Product(Client):
         product_children = []
         odoo_product_template = []
         magento_product_product = []
+
         if len(products) > 0:
             for product in products:
                 if 'id' in product:
-                    product_exist = context.env['magento.product.product'].search([('external_id', '=', product['id'])])
+                    product_exist = context.env['magento.product.product'].sudo().search([('external_id', '=', product['id'])])
                     # kiem tra product nay da duoc pull ve hay chua
-                    if not len(product_exist) > 0:
-                        extension_attributes = product['extension_attributes']
-                        if 'configurable_product_links' in extension_attributes:
-                            configurable_product_links = extension_attributes['configurable_product_links']
-                            for product_link in configurable_product_links:
-                                product_children.append(product_link)
-                        external_product_id = product['id']
-                        name = product['name']
-                        if 'price' in product:
-                            price = product['price']
-                        else:
-                            price = 0
-                        custom_attributes = product['custom_attributes']
-                        # add category
-                        categories = []
-                        if 'category_links' in product['extension_attributes']:
-                            magento_categories = product['extension_attributes']['category_links']
-                            list_magento_category = []
-                            for rec in magento_categories:
-                                list_magento_category.append(rec['category_id'])
-                            total_category = context.env['magento.product.category'].search(
-                                [('backend_id', '=', backend_id)])
-                            for cate in total_category:
-                                if str(cate.external_id) in list_magento_category:
-                                    categories.append(cate.odoo_id.id)
+                    extension_attributes = product['extension_attributes']
+                    if 'configurable_product_links' in extension_attributes:
+                        configurable_product_links = extension_attributes['configurable_product_links']
+                        for product_link in configurable_product_links:
+                            product_children.append(product_link)
+                    external_product_id = product['id']
+                    name = product['name']
+                    if 'price' in product:
+                        price = product['price']
+                    else:
+                        price = 0
+                    custom_attributes = product['custom_attributes']
+                    # add category
+                    categories = []
+                    if 'category_links' in product['extension_attributes']:
+                        magento_categories = product['extension_attributes']['category_links']
+                        list_magento_category = []
+                        for rec in magento_categories:
+                            list_magento_category.append(rec['category_id'])
+                        total_category = context.env['magento.product.category'].search(
+                            [('backend_id', '=', backend_id)])
+                        for cate in total_category:
+                            if str(cate.external_id) in list_magento_category:
+                                categories.append(cate.odoo_id.id)
 
-                        category = "1"
-                        unit_of_measure = "1"
-                        uom_po_id = "1"
-                        responsible_id = "1"
-                        sku = product['sku']
-                        sequence = '1'
-                        sale_ok = True
-                        purchase_ok = True
-                        if 'weight' in product:
-                            weight = product['weight']
-                        else:
-                            weight = 0
-                        # todo
-                        if weight > 0:
-                            magento_product_type = 'product'
-                        else:
-                            magento_product_type = 'product'
-                        product_type_magento = 'magento_' + str(product['type_id'])
+                    category = "1"
+                    unit_of_measure = "1"
+                    uom_po_id = "1"
+                    responsible_id = "1"
+                    sku = product['sku']
+                    sequence = '1'
+                    sale_ok = True
+                    purchase_ok = True
+                    if 'weight' in product:
+                        weight = product['weight']
+                    else:
+                        weight = 0
+                    # todo
+                    if weight > 0:
+                        magento_product_type = 'product'
+                    else:
+                        magento_product_type = 'product'
+                    product_type_magento = 'magento_' + str(product['type_id'])
+                    if not len(product_exist) > 0:
                         # update
                         sku_existed = context.env['product.template'].search([('default_code', '=', sku)])
                         if sku_existed:
@@ -304,6 +305,29 @@ class Product(Client):
                                         'is_heineken_product': True
                                     })
                                 magento_product_product.append((external_product_id, backend_id))
+                    else:
+                        print(product_exist.odoo_id.id)
+                        product_template = context.env['product.template'].sudo().search([('id', '=', product_exist.odoo_id.product_tmpl_id.id)])
+                        print(product_template)
+                        product_template.write({
+                            'name': name,
+                            'default_code': sku,
+                            'active': True,
+                            'list_price': price,
+                            'magento_sale_price': price,
+                            'weight': weight,
+                            'categ_id': category,
+                            'categories': [((4, cate_id)) for cate_id in categories],
+                            # 'uom_id': unit_of_measure,
+                            # 'uom_po_id': uom_po_id,
+                            'responsible_id': responsible_id,
+                            'sequence': sequence,
+                            'sale_ok': sale_ok,
+                            'type': magento_product_type,
+                            'magento_product_type': product_type_magento,
+                            'purchase_ok': purchase_ok,
+                            'is_magento_product': True,
+                        })
             if odoo_product_template and len(odoo_product_template) > 0:
                 product_template_ids = context.env['product.template'].create(odoo_product_template)
                 product_product_ids = []

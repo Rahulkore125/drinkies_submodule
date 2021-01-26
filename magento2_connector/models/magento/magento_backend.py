@@ -305,7 +305,9 @@ class MagentoBackend(models.Model):
                         if pull_history_configurable_product:
                             # second pull
                             sync_date = pull_history_configurable_product.sync_date
-                            products = pro.list_gt_updated_product(sync_date, 'eq')
+                            time_pull = datetime(sync_date.year, month=sync_date.month,
+                                                 day=sync_date.day, hour=00, minute=00, second=00)
+                            products = pro.list_gt_updated_product(time_pull, 'eq')
                             if len(products['items']) > 0:
                                 pull_history_configurable_product.write({
                                     'sync_date': datetime.today()
@@ -343,7 +345,10 @@ class MagentoBackend(models.Model):
                     try:
                         if pull_history_normal_product:
                             sync_date = pull_history_normal_product.sync_date
-                            products = pro.list_gt_updated_product(sync_date, 'neq')
+                            time_pull = datetime(sync_date.year, month=sync_date.month,
+                                                 day=sync_date.day, hour=00, minute=00, second=00)
+                            products = pro.list_gt_updated_product(time_pull, 'neq')
+
                             if len(products['items']) > 0:
                                 pull_history_normal_product.write({
                                     'sync_date': datetime.today()

@@ -182,15 +182,26 @@ class Order(Client):
                             odoo_product_product = context.env['product.product'].sudo().search([('id', '=', product_id)], limit=1)
 
                             if 'parent_item' in product_item:
-                                order_lines.append(
-                                    (0, 0, {'name': product_item['name'], 'product_id': product_id,
-                                            'product_uom_qty': product_item['parent_item']['qty_ordered'],
-                                            'qty_delivered': product_item['parent_item']['qty_shipped'],
-                                            'qty_invoiced': product_item['parent_item']['qty_invoiced'],
-                                            'price_unit': odoo_product_product.lst_price,
-                                            'discount': 0,
-                                            # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
-                                            'tax_id': [(6, 0, [])]}))
+                                if product_item['parent_item']['product_type'] == 'configurable':
+                                    order_lines.append(
+                                        (0, 0, {'name': product_item['name'], 'product_id': product_id,
+                                                'product_uom_qty': product_item['parent_item']['qty_ordered'],
+                                                'qty_delivered': product_item['parent_item']['qty_shipped'],
+                                                'qty_invoiced': product_item['parent_item']['qty_invoiced'],
+                                                'price_unit': product_item['parent_item']['price'],
+                                                'discount': 0,
+                                                # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
+                                                'tax_id': [(6, 0, [])]}))
+                                elif product_item['parent_item']['product_type'] == 'bundle':
+                                    order_lines.append(
+                                        (0, 0, {'name': product_item['name'], 'product_id': product_id,
+                                                'product_uom_qty': product_item['parent_item']['qty_ordered'],
+                                                'qty_delivered': product_item['parent_item']['qty_shipped'],
+                                                'qty_invoiced': product_item['parent_item']['qty_invoiced'],
+                                                'price_unit': odoo_product_product.lst_price,
+                                                'discount': 0,
+                                                # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
+                                                'tax_id': [(6, 0, [])]}))
                             else:
                                 if product_item['product_type'] == 'bundle':
                                     order_lines.append(

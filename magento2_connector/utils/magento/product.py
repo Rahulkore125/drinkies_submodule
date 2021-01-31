@@ -39,6 +39,7 @@ class Product(Client):
         odoo_product_product_ids = []
         magento_product_product = []
         for product in products:
+            print('dadadad')
             # magento
             external_product_id = product['id']
             # product_type_magento = 'magento_'+str(product['type_id'])
@@ -117,7 +118,7 @@ class Product(Client):
                             # print(magento_attribute_values)
                             attribute_ids.append((0, 0, {'attribute_id': odoo_attribute_id,
                                                          'value_ids': [(6, 0, magento_attribute_values)]}))
-                sku_existed = context.env['product.template'].search([('default_code', '=', sku)])
+                sku_existed = context.env['product.product'].search([('default_code', '=', sku)])
                 if sku_existed:
                     sku_existed.write({
                         'name': name,
@@ -186,6 +187,7 @@ class Product(Client):
         return 0
 
     def insert_not_configurable_product(self, products, backend_id, url, token, context=None):
+        print('fsfsfsffs')
         product_children = []
         odoo_product_template = []
         magento_product_product = []
@@ -240,13 +242,13 @@ class Product(Client):
                     product_type_magento = 'magento_' + str(product['type_id'])
                     if not len(product_exist) > 0:
                         # update
-                        sku_existed = context.env['product.template'].search([('default_code', '=', sku)])
+                        sku_existed = context.env['product.product'].search([('default_code', '=', sku)])
                         if sku_existed:
                             sku_existed.write({
                                 'name': name,
                                 'default_code': sku,
                                 'active': True,
-                                'list_price': price,
+                                'lst_price': price,
                                 'magento_sale_price': price,
                                 'weight': weight,
                                 'categ_id': category,
@@ -306,14 +308,12 @@ class Product(Client):
                                     })
                                 magento_product_product.append((external_product_id, backend_id))
                     else:
-                        print(product_exist.odoo_id.id)
-                        product_template = context.env['product.template'].sudo().search([('id', '=', product_exist.odoo_id.product_tmpl_id.id)])
-                        print(product_template)
-                        product_template.write({
+                        product_product = context.env['product.product'].sudo().search([('id', '=', product_exist.odoo_id.id)])
+                        product_product.write({
                             'name': name,
                             'default_code': sku,
                             'active': True,
-                            'list_price': price,
+                            'lst_price': price,
                             'magento_sale_price': price,
                             'weight': weight,
                             'categ_id': category,

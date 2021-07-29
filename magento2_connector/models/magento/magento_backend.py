@@ -324,7 +324,7 @@ class MagentoBackend(models.Model):
                         total_count = products['total_count']
                         # truong hop dac biet voi drinkies it san pham nen ko can chia thanh tung phan de fetch nua
 
-                        pro.insert_configurable_product(products['items'], backend_id, url, token, self)
+                        # pro.insert_configurable_product(products['items'], backend_id, url, token, self)
 
                         # total_page = get_current_page(total_count, page_size)
                         # if total_page > 0:

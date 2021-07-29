@@ -261,8 +261,7 @@ class Order(Client):
                         shipment_product_product = context.env.ref('magento2_connector.magento_getswift_shipping_product')
                         shipment_product_product_id = shipment_product_product.id
                         shipment_product_product_name = shipment_product_product.name
-                        delivery_method = context.env['delivery.carrier'].search(
-                            [('name', 'like', '%GetSwift%')])
+                        delivery_method = context.env.ref('magento2_connector.getswift_shipping_method')
                         carrier_id = delivery_method.ids[0]
                         order_lines.append((0, 0, {'name': shipment_product_product_name,
                                                    'price_unit': shipment_amount,
@@ -276,8 +275,7 @@ class Order(Client):
                         shipment_product_product = context.env.ref('magento2_connector.magento_mrs_speedy_shipping_product')
                         shipment_product_product_id = shipment_product_product.id
                         shipment_product_product_name = shipment_product_product.name
-                        delivery_method = context.env['delivery.carrier'].search(
-                            [('name', 'like', '%MrsSpeedy%')])
+                        delivery_method = context.env.ref('magento2_connector.mrs_speedy_shipping_method')
                         carrier_id = delivery_method.ids[0]
                         order_lines.append((0, 0, {'name': shipment_product_product_name,
                                                    'price_unit': shipment_amount,

@@ -75,7 +75,7 @@
             <field name="product_id" ref="magento2_connector.magento_getswift_shipping_product"/>
         </record>
 
-        <record id="getswift_shipping_method" model="delivery.carrier">
+        <record id="mrs_speedy_shipping_method" model="delivery.carrier">
             <field name="name">MrsSpeedy Shipping Method</field>
             <field name="intergration_level">rate and ship</field>
             <field name="active">True</field>

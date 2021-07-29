@@ -277,7 +277,7 @@ class Order(Client):
                         shipment_product_product_id = shipment_product_product.id
                         shipment_product_product_name = shipment_product_product.name
                         delivery_method = context.env['delivery.carrier'].search(
-                            [('name', 'like', '%Mrs Speedy%')])
+                            [('name', 'like', '%MrsSpeedy%')])
                         carrier_id = delivery_method.ids[0]
                         order_lines.append((0, 0, {'name': shipment_product_product_name,
                                                    'price_unit': shipment_amount,

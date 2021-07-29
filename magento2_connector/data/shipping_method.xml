@@ -81,8 +81,8 @@
             <field name="active">True</field>
             <field name="fixed_price">0</field>
             <field name="taxes_id" eval="[(6, 0, [])]"/>
-            <field name="default_code">GetSwift Shipping Method</field>
-            <field name="product_id" ref="magento2_connector.magento_getswift_shipping_product"/>
+            <field name="default_code">MrsSpeedy Method</field>
+            <field name="product_id" ref="magento2_connector.magento_mrs_speedy_shipping_product"/>
         </record>
     </data>
 </odoo>

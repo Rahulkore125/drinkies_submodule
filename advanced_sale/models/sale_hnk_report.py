@@ -21,16 +21,13 @@ class SaleHnkReport(models.Model):
 
     def generate_report(self):
         a = self.env.user.tz_offset
-
         prefix = a.split('00')[0]
-
         if prefix[0] == '+':
             time_offset = int(prefix.split('+')[1])
         elif prefix[0] == '-':
             time_offset = - int(prefix.split('-')[1])
 
         values = []
-
         product_ids = {}
 
         sale = self.env.ref('advanced_sale.sale').id

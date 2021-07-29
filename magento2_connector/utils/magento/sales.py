@@ -261,6 +261,14 @@ class Order(Client):
                         delivery_method = context.env['delivery.carrier'].search(
                             [('name', 'like', '%GetSwift%')])
                         carrier_id = delivery_method.ids[0]
+                        order_lines.append((0, 0, {'name': shipment_product_product_name,
+                                                   'price_unit': shipment_amount,
+                                                   'price_subtotal': shipment_amount,
+                                                   'product_id': shipment_product_product_id,
+                                                   'product_uom_qty': 1,
+                                                   'product_uom': 1,
+                                                   'tax_id': [(6, 0, [])],
+                                                   'is_delivery': True}))
                     if 'tax_amount' in order and order['tax_amount'] > 0:
                         tax_amount = order['tax_amount']
                         tax_real_product_id = context.env.ref('magento2_connector.tax_real')

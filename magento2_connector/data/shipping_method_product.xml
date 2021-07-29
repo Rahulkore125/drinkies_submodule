@@ -18,6 +18,23 @@
             <field name="uom_id" ref="uom.product_uom_unit"/>
             <field name="uom_po_id" ref="uom.product_uom_unit"/>
         </record>
+        <record id="magento_getswift_shipping_product" model="product.product">
+            <field name="name">Getswift Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+        <record id="magento_mrs_speedy_shipping_product" model="product.product">
+            <field name="name">Mrs Speedy Shipping</field>
+            <field name="standard_price">0</field>
+            <field name="list_price">0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        </record>
+
         <record id="magento_table_rates_shipping_product" model="product.product">
             <field name="name">Table Rates</field>
             <field name="standard_price">0</field>

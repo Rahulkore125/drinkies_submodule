@@ -258,6 +258,9 @@ class Order(Client):
                                                    'tax_id': [(6, 0, [])],
                                                    'is_delivery': True}))
                     if shipment_method == 'getswift_getswift':
+                        shipment_product_product = context.env.ref('magento2_connector.magento_getswift_shipping_product')
+                        shipment_product_product_id = shipment_product_product.id
+                        shipment_product_product_name = shipment_product_product.name
                         delivery_method = context.env['delivery.carrier'].search(
                             [('name', 'like', '%GetSwift%')])
                         carrier_id = delivery_method.ids[0]
@@ -270,6 +273,9 @@ class Order(Client):
                                                    'tax_id': [(6, 0, [])],
                                                    'is_delivery': True}))
                     if shipment_method == 'mrspeedy_mrspeedy':
+                        shipment_product_product = context.env.ref('magento2_connector.magento_mrs_speedy_shipping_product')
+                        shipment_product_product_id = shipment_product_product.id
+                        shipment_product_product_name = shipment_product_product.name
                         delivery_method = context.env['delivery.carrier'].search(
                             [('name', 'like', '%Mrs Speedy%')])
                         carrier_id = delivery_method.ids[0]

@@ -198,7 +198,7 @@ class Order(Client):
                                                 'product_uom_qty': product_item['parent_item']['qty_ordered'],
                                                 'qty_delivered': product_item['parent_item']['qty_shipped'],
                                                 'qty_invoiced': product_item['parent_item']['qty_invoiced'],
-                                                'price_unit': odoo_product_product.lst_price,
+                                                'price_unit': product_item['price'],
                                                 'discount': 0,
                                                 # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
                                                 'tax_id': [(6, 0, [])]}))
@@ -209,7 +209,7 @@ class Order(Client):
                                                 'product_uom_qty': product_item['qty_ordered'],
                                                 'qty_delivered': product_item['qty_shipped'],
                                                 'qty_invoiced': product_item['qty_invoiced'],
-                                                'price_unit': 0,
+                                                'price_unit': product_item['price'],
                                                 'discount': 0,
                                                 # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
                                                 'tax_id': [(6, 0, [])]}))
@@ -223,7 +223,7 @@ class Order(Client):
                                                 'discount': 0,
                                                 # 'direct_discount_amount': product_item['original_price'] - product_item['price'],
                                                 'tax_id': [(6, 0, [])]}))
-
+                                    print(product_item['price'])
                     if shipment_method == 'flatrate_flatrate':
                         shipment_product_product = context.env.ref(
                             'magento2_connector.magento_flat_rate_shipping_product')
